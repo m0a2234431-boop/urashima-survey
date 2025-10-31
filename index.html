@@ -1,6 +1,63 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>挿絵生成・描写精度アンケート（浦島太郎）</title>
+<style>
+  :root{
+    --bg:#0b0c10; --panel:#151821; --ink:#e8ecf1; --muted:#a7b0bd; --accent:#5aa9e6; --accent-2:#7fc8ff;
+    --ok:#3ccf91; --ng:#ff6b6b; --neutral:#c3cad4;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto, "Hiragino Kaku Gothic ProN","Meiryo",sans-serif}
+  .wrap{max-width:1100px;margin:0 auto;padding:24px}
+  .card{background:var(--panel);border:1px solid #232738;border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  .header{padding:20px 22px;border-bottom:1px solid #232738}
+  .body{padding:22px}
+  h1{margin:0 0 4px 0;font-size:24px}
+  p{line-height:1.7}
+  .muted{color:var(--muted)}
+  .btn{appearance:none;border:0;border-radius:12px;padding:12px 18px;background:var(--accent);color:#071018;font-weight:700;cursor:pointer;box-shadow:0 8px 20px rgba(90,169,230,.35);transition:transform .04s ease, box-shadow .2s ease}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 12px 24px rgba(90,169,230,.45)}
+  .btn:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
+  .btn-secondary{background:#2a3142;color:#e8ecf1;box-shadow:none}
+  .btn-ghost{background:transparent;color:var(--muted);border:1px solid #30384a}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .grow{flex:1}
+  .right{margin-left:auto}
+  .notice{padding:12px 14px;border-radius:12px;background:#10131a;border:1px solid #273044;color:#dbe6f6}
+  .notice.ok{border-color:#1f6a4c;background:rgba(60,207,145,.08)}
+  .notice.ng{border-color:#5e2b2b;background:rgba(255,107,107,.08)}
+  .scene-text{padding:14px 16px;border-radius:12px;background:#0f131c;border:1px dashed #2e3a4f;white-space:pre-wrap}
+  .grid{display:grid;grid-template-columns:repeat(5, 1fr);gap:12px;margin-top:14px}
+  @media (max-width:1024px){.grid{grid-template-columns:repeat(4,1fr)}}
+  @media (max-width:780px){.grid{grid-template-columns:repeat(3,1fr)}}
+  @media (max-width:560px){.grid{grid-template-columns:repeat(2,1fr)}}
+  .imgbox{position:relative;border-radius:12px;overflow:hidden;border:2px solid #21283a;background:#0e1118;cursor:pointer;transition:border-color .12s ease, transform .06s ease}
+  .imgbox:hover{transform:translateY(-1px)}
+  .imgbox.selected{border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(127,200,255,.25) inset}
+  .imgbox img {
+  display: block;
+  width: 100%;          /* 親要素にフィット */
+  height: auto;         /* 縦横比を保つ */
+  object-fit: contain;  /* 画像全体を切らずに収める */
+  background: #0b0f17;  /* 背景色 */
+  border-radius: 0;     /* 角丸が不要なら消す */
+}
+  .tag{position:absolute;left:8px;top:8px;background:#0f1522;color:#cfe7ff;border:1px solid #2a3a58;border-radius:999px;padding:4px 8px;font-size:12px}
+  .badge{display:inline-block;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700;margin-right:8px}
+  .b-ok{background:rgba(60,207,145,.18);border:1px solid rgba(60,207,145,.5);color:#c8ffe7}
+  .b-ng{background:rgba(255,107,107,.18);border:1px solid rgba(255,107,107,.45);color:#ffd6d6}
+  .b-neu{background:rgba(195,202,212,.18);border:1px solid rgba(195,202,212,.45);color:#eaedf2}
+  .footer{padding:14px 16px;border-top:1px solid #232738;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .small{font-size:12px;color:#9fb1c6}
+  .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;padding:2px 6px;border:1px solid #334055;border-radius:6px;background:#0e1219;color:#c9d6e7}
+  .hr{border-top:1px dashed #2c3446;margin:18px 0}
+  .pill{display:inline-block;padding:8px 12px;border-radius:999px;background:#0e1420;border:1px solid #2b374c;color:#cfe1ff}
+  .tag { display: none !important; }
+</style>
 </head>
 <body>
   <div class="wrap">
@@ -9,35 +66,538 @@
         <h1>挿絵生成・描写精度アンケート</h1>
         <div class="muted">テーマ：挿絵生成における入力形式の違いによる描写精度の分析</div>
       </div>
-      
-      <form action="https://script.google.com/macros/s/AKfycbz3jqvv2SYsc7-e9XP7Q5lJEQcFN4rknGluz85o8L3ilQxnQ3fKSFzfZJqhjIDvn41goQ/exec" method="POST">
-
-        <div class="body" id="app">
-          <div class="notice">
-            <p>このフォームは、データ送信機能が動作するかをテストするためのものです。</p>
-          </div>
-          
-          <div class="hr"></div>
-
-          <p><strong>お名前を入力してください：</strong></p>
-          <input type="text" name="participantName" placeholder="例：山田太郎" style="width:100%;padding:10px;font-size:16px;border-radius:8px;border:1px solid #333;background:#0e1219;color:#fff;margin-bottom:10px;" required>
-
-          <div class="hr"></div>
-
-          <div class="notice ok">
-              <p>お名前を入力し、「決定（データ送信）」ボタンを押してください。</p>
-          </div>
-
-        </div>
-        <div class="footer" id="footer">
-          <div class="row">
-              <div class="grow"></div>
-              <button class="btn" type="submit">決定（データ送信）</button>
-          </div>
-        </div>
-      </form>
+      <div class="body" id="app">
+        <!-- 動的に置換 -->
+      </div>
+      <div class="footer" id="footer">
+        <!-- 動的に置換 -->
+      </div>
     </div>
   </div>
+
+<script>
+/** ====== 設定：ここを書き換えてください ====== */
+
+// 1) 回答の保存先（Google Apps Script WebApp の URL）
+// 空の場合は送信をスキップしローカルに退避します
+const SHEETS_ENDPOINT ="https://script.google.com/macros/s/AKfycbz3jqvv2SYsc7-e9XP7Q5lJEQcFN4rknGluz85o8L3ilQxnQ3fKSFzfZJqhjIDvn41goQ/exec";
+
+// 2) 参加者ID（任意）: URLの?pid=xxxx が優先されます
+const DEFAULT_PARTICIPANT_ID = "pilot-001";
+
+// 3) シーン本文と画像URL（各シーン＝3手法×10枚＝計30枚）
+/*
+  手法ラベルは a=①文章そのまま, b=②要素そのまま, c=③要素→簡潔文
+  画像URLは実際の画像に差し替えてください。
+*/
+const SCENES = [
+  {
+    id: "scene1",
+    title: "浦島太郎が玉手箱を開け、お爺さんになるシーン",
+    text: `本文：
+　しおしおとまた浜べへ出てみましたが、海の水はまんまんとたたえていて、どこがはてともしれません。
+　もうかめも出てきませんから、どうしてりゅう宮へわたろう手だてもありませんでした。 
+　そのとき、浦島はふと、かかえていた玉手箱に気がつきました。
+
+「そうだ。この箱はこをあけてみたらば、わかるかもしれない」
+
+　こうおもうとうれしくなって、浦島は、うっかり乙姫さまにいわれたことはわすれて、箱のふたをとりました。するとむらさき色の雲が、なかからむくむく立ちのぼって、それが顔にかかったかとおもうと、すうっと消えて行って箱のなかにはなんにものこっていませんでした。
+　その代わり、いつのまにか顔じゅうしわになって、手も足もちぢかまって、きれいなみぎわの水にうつった影かげを見ると、髪かみもひげも、まっしろな、かわいいおじいさんになっていました。
+　浦島はからになった箱はこのなかをのぞいて、
+
+「なるほど、乙姫さまが、人間のいちばんだいじなたからを入れておくとおっしゃったあれは、人間の寿命だったのだな」
+
+　と、ざんねんそうにつぶやきました。
+　春の海はどこまでも遠くかすんでいました。どこからかいい声で舟うたをうたうのが、またきこえてきました。
+　浦島は、ぼんやりとむかしのことをおもい出していました。`,
+    images: {
+      a: Array.from({length:10}, (_,i)=>`img/scene1/a_${String(i+1).padStart(2,'0')}.png`),
+      b: Array.from({length:10}, (_,i)=>`img/scene1/b_${String(i+1).padStart(2,'0')}.png`),
+      c: Array.from({length:10}, (_,i)=>`img/scene1/c_${String(i+1).padStart(2,'0')}.png`)
+    }
+  },
+  {
+    id: "scene2",
+    title: "冒頭シーン",
+    text: `本文：
+　むかし、むかし、丹後の国水の江の浦に、浦島太郎という漁師がありました。
+　浦島太郎は、毎日釣り竿を担いでは海へ出かけて、鯛や、鰹などのお魚を釣って、お父さんお母さんを養っていました。`,
+    images: {
+      a: Array.from({length:10}, (_,i)=>`img/scene2/a_${String(i+1).padStart(2,'0')}.png`),
+      b: Array.from({length:10}, (_,i)=>`img/scene2/b_${String(i+1).padStart(2,'0')}.png`),
+      c: Array.from({length:10}, (_,i)=>`img/scene2/c_${String(i+1).padStart(2,'0')}.png`)
+    }
+  },
+  {
+    id: "scene3",
+    title: "亀が浦島太郎を竜宮城に誘うシーン",
+    text: `本文：
+　それから二、三日たって、浦島はまた舟にのって海へつりに出かけました。
+　遠い沖のほうまでもこぎ出して、一生けんめいおさかなをつっていますと、ふとうしろのほうで
+
+「浦島さん、浦島さん」
+
+　とよぶ声がしました。おやとおもってふりかえってみますと、だれも人のかげは見えません。その代り、いつのまにか、一ぴきのかめが、舟のそばにきていました。
+
+　浦島がふしぎそうな顔をしていると、
+
+「わたくしは、先日助けていただいたかめでございます。きょうはちょっとそのお礼にまいりました」
+
+　かめがこういったので、浦島はびっくりしました。
+
+「まあ、そうかい。わざわざ礼なんぞいいにくるにはおよばないのに」
+「でも、ほんとうにありがとうございました。ときに、浦島さん、あなたはりゅう宮をごらんになったことがありますか」
+「いや、話にはきいているが、まだ見たことはないよ」
+「ではほんのお礼のしるしに、わたくしがりゅう宮を見せて上げたいとおもいますがいかがでしょう」
+「へえ、それはおもしろいね。ぜひ行ってみたいが、それはなんでも海の底にあるということではないか。どうして行くつもりだね。わたしにはとてもそこまでおよいでは行けないよ」
+「なに、わけはございません。わたくしの背中におのりください」
+
+　かめはこういって、背中を出しました。浦島は半分きみわるくおもいながら、いわれるままに、かめの背中にのりました。`,
+    images: {
+      a: Array.from({length:10}, (_,i)=>`img/scene3/a_${String(i+1).padStart(2,'0')}.png`),
+      b: Array.from({length:10}, (_,i)=>`img/scene3/b_${String(i+1).padStart(2,'0')}.png`),
+      c: Array.from({length:10}, (_,i)=>`img/scene3/c_${String(i+1).padStart(2,'0')}.png`)
+    }
+  },
+  {
+    id: "scene4",
+    title: "浦島太郎が亀の背に乗って、竜宮城から浜辺へ帰ってくるシーン",
+    text: `本文：
+　浦島はうれしいのとかなしいのとで、胸むねがいっぱいになっていました。そしてかめの背中にのりますと、かめはすぐ波を切って上がって行って、まもなくもとの浜べにつきました。
+
+「では浦島さん、ごきげんよろしゅう」
+
+　と、かめはいって、また水のなかにもぐって行きました。浦島はしばらく、かめの行ゆくえを見送っていました。
+　浦島は海ばたに立ったまま、しばらくそこらを見まわしました。
+
+　春の日がぽかぽかあたって、いちめんにかすんだ海の上に、どこからともなく、にぎやかな舟うたがきこえました。
+　それは夢のなかで見たふるさとの浜べの景色とちっともちがったところはありませんでした。
+　けれどよく見ると、そこらの様子がなんとなくかわっていて、あう人もあう人も、いっこうに見知らない顔ばかりで、むこうでもみょうな顔をして、じろじろ見ながら、ことばもかけずにすまして行ってしまいます。`,
+    images: {
+      a: Array.from({length:10}, (_,i)=>`img/scene4/a_${String(i+1).padStart(2,'0')}.png`),
+      b: Array.from({length:10}, (_,i)=>`img/scene4/b_${String(i+1).padStart(2,'0')}.png`),
+      c: Array.from({length:10}, (_,i)=>`img/scene4/c_${String(i+1).padStart(2,'0')}.png`)
+    }
+  },
+  {
+    id: "scene5",
+    title: "子どもたちにいじめられている亀を浦島太郎が見つけるシーン",
+    text: `本文：
+　ある日、浦島はいつもの通り海へ出て、一日お魚を釣って、帰ってきました。途中、子どもが五、六人往来に集まって、がやがや言っていました。
+　何かとおもって浦島がのぞいてみると、小さいかめの子を一ぴきつかまえて、棒でつついたり、石でたたいたり、さんざんにいじめているのです。浦島は見かねて、
+
+「まあ、そんなかわいそうなことをするものではない。いい子だから」
+
+　と、とめましたが、子どもたちはきき入れようともしないで、
+
+「なんだい。なんだい、かまうもんかい」
+
+　といいながら、またかめの子を、あおむけにひっくりかえして、足でけったり、砂のなかにうずめたりしました。
+　浦島はますますかわいそうにおもって、
+
+「じゃあ、おじさんがおあしをあげるから、そのかめの子を売っておくれ」
+
+　といいますと、こどもたちは、
+
+「うんうん、おあしをくれるならやってもいい」
+
+　といって、手を出しました。そこで浦島はおあしをやってかめの子をもらいうけました。
+　子どもたちは、
+
+「おじさん、ありがとう。また買っておくれよ」
+
+　と、わいわいいいながら、行ってしまいました。`,
+    images: {
+      a: Array.from({length:10}, (_,i)=>`img/scene5/a_${String(i+1).padStart(2,'0')}.png`),
+      b: Array.from({length:10}, (_,i)=>`img/scene5/b_${String(i+1).padStart(2,'0')}.png`),
+      c: Array.from({length:10}, (_,i)=>`img/scene5/c_${String(i+1).padStart(2,'0')}.png`)
+    }
+  }
+];
+
+/** ====== ここから下は基本ノータッチでOK（ロジック） ====== */
+
+// ユーティリティ
+const qs = (s, el=document)=>el.querySelector(s);
+const qsa = (s, el=document)=>Array.from(el.querySelectorAll(s));
+const sleep = (ms)=>new Promise(res=>setTimeout(res,ms));
+const shuffle = (arr)=>{
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];}
+  return a;
+};
+const chunk = (arr, size)=>arr.reduce((acc,_,i)=> i%size? acc : [...acc, arr.slice(i,i+size)], []);
+
+const urlPID = new URLSearchParams(location.search).get('pid');
+const PARTICIPANT_ID = urlPID || DEFAULT_PARTICIPANT_ID;
+
+const APP = qs('#app');
+const FOOT = qs('#footer');
+
+const STATE = {
+  started:false,
+  sceneOrder: [],
+  sceneIndex: 0,
+  batchIndex: 0,
+  phase: 1, // 1=「描写できている」, 2=「できていない」
+  currentBatch: [],
+  remainingInBatch: [],
+  selections: new Set(), // 現フェーズでの選択（imgId）
+  log: [] // 送信済み or 待ち
+};
+
+// 画像オブジェクトへ整形
+function buildSceneDeck(scene){
+  // 3手法×10枚を method: 'a'|'b'|'c' で混ぜる
+  const deck = [];
+  for (const method of ['a','b','c']){
+    scene.images[method].forEach((url, i)=>{
+      deck.push({
+        sceneId: scene.id,
+        method,
+        url,
+        // 一意ID（sceneId-method-index）
+        imgId: `${scene.id}_${method}_${String(i+1).padStart(2,'0')}`
+      });
+    });
+  }
+  return shuffle(deck);
+}
+
+// ローカル退避（送信失敗時の再送用）
+function saveLocalQueue(){
+  localStorage.setItem('urashima_survey_queue', JSON.stringify(STATE.log));
+}
+function loadLocalQueue(){
+  try{
+    const raw = localStorage.getItem('urashima_survey_queue');
+    if(raw){ STATE.log = JSON.parse(raw); }
+  }catch(e){}
+}
+async function flushQueue(){
+  if(!SHEETS_ENDPOINT){ return; }
+  const pending = STATE.log.filter(d=>!d.sent);
+  for(const item of pending){
+    try{
+      const res = await fetch(SHEETS_ENDPOINT, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(item.payload)
+      });
+      if(res.ok){
+        item.sent = true;
+        saveLocalQueue();
+        await sleep(150);
+      }
+    }catch(e){
+      // ネットワーク失敗時は後で再送
+    }
+  }
+}
+
+// 送信（1フェーズぶん or バッチ確定ぶん）
+async function submitRatings(payload){
+  const record = {payload, sent:false};
+  STATE.log.push(record);
+  saveLocalQueue();
+
+  if(!SHEETS_ENDPOINT){
+    console.info('[LOG ONLY] payload:', payload);
+    return;
+  }
+  try{
+    const res = await fetch(SHEETS_ENDPOINT, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    if(res.ok){
+      record.sent = true;
+      saveLocalQueue();
+    }else{
+      console.warn('送信エラー：', await res.text());
+    }
+  }catch(e){
+    console.warn('送信失敗：オフラインかエンドポイント不正', e);
+  }
+}
+
+// 画面描画
+function renderIntro(){
+  APP.innerHTML = `
+    <div class="notice">
+      <p>本アンケートでは、小説『浦島太郎』の一部をもとに、画像生成AIによって作成された挿絵を評価していただきます。</p>
+      <p>各シーンごとに、元の文章と生成された画像（1シーンあたり計30枚）を見比べてください。</p>
+      <p>そのうえで、各画像を「文章の内容を描写できている」「文章の内容を描写できていない」「どちらでもない」のどれかを選択してください。</p>
+
+      <p>以下、アンケートの記入方法です。</p>
+      <ol style="margin:0 0 0 1.1em;padding:0;line-height:1.8">
+        <li>「次へ」を押すと、ランダムで<strong>シーン本文</strong>が表示されます。</li>
+        <li>本文に対し、ランダムで<strong>10枚の画像</strong>が表示されます。</li>
+        <li><span class="badge b-ok">描写できていると思う画像</span>をクリックで選んで「決定」。</li>
+        <li>残った画像から<span class="badge b-ng">描写できていないと思う画像</span>を選んで「決定」。</li>
+        <li>選ばれなかった画像は、<span class="badge b-neu">どちらでもない</span>として自動判定されます。</li>
+        <li>10枚×<strong>3バッチ</strong>を終えると次のシーンに進みます（全<strong>5シーン</strong>）。</li>
+      </ol>
+
+      <div class="hr"></div>
+      <p><strong>お名前を入力してください：</strong></p>
+      <input type="text" id="nameInput" placeholder="例：山田太郎" style="width:100%;padding:10px;font-size:16px;border-radius:8px;border:1px solid #333;background:#0e1219;color:#fff;margin-bottom:10px;">
+    </div>
+
+    <div class="hr"></div>
+    <div class="row">
+      <div class="grow"></div>
+      <button class="btn right" id="startBtn">次へ（開始）</button>
+    </div>
+  `;
+
+  FOOT.innerHTML = `<span class="small">本研究は学術目的の比較評価です。選択は画像だけを基準に、直感で構いません。</span>`;
+
+  // 名前入力と開始処理
+  const nameInput = document.getElementById('nameInput');
+  const startBtn = document.getElementById('startBtn');
+
+  startBtn.onclick = () => {
+    const nameValue = nameInput.value.trim();
+    if (!nameValue) {
+      alert("名前を入力してください。");
+      return;
+    }
+
+    // 名前を識別情報として保存
+    STATE.participantName = nameValue;
+    STATE.participantId = nameValue; // スプレッドシートでは participantId に名前が記録される
+
+    // アンケート開始
+    startSurvey();
+  };
+}
+
+function sceneHeader(scene, batchIdx, phase){
+  const phaseText = phase===1
+    ? `「<strong>文章の内容を描写できている</strong>」と思う画像にチェックを入れてください。<span class="small">（複数選択可）</span>`
+    : `残っている画像から「<strong>文章の内容を描写できていない</strong>」と思う画像にチェックを入れてください。<span class="small">（複数選択可）</span>`;
+  const badge = phase===1 ? `<span class="badge b-ok">描写できている</span>` : `<span class="badge b-ng">できていない</span>`;
+
+  return `
+    <div class="row" style="align-items:center;margin-bottom:8px">
+      <div class="grow"><h2 style="margin:0;font-size:18px">${scene.title} <span class="muted">（バッチ ${batchIdx+1}/3）</span></h2></div>
+      <div class="pill">手順：${badge} を選択 → 決定</div>
+    </div>
+    <div class="scene-text">${scene.text}</div>
+    <div class="notice" style="margin-top:12px">${phaseText}</div>
+  `;
+}
+
+function renderBatch(scene){
+  const headerHTML = sceneHeader(scene, STATE.batchIndex, STATE.phase);
+  const gridHTML = `
+    <div class="grid" id="grid">
+      ${STATE.remainingInBatch.map(item=>`
+        <div class="imgbox" data-imgid="${item.imgId}">
+          <span class="tag">${methodLabel(item.method)}</span>
+          <img loading="lazy" src="${item.url}" alt="${item.imgId}" />
+        </div>
+      `).join('')}
+    </div>
+  `;
+  APP.innerHTML = headerHTML + gridHTML;
+
+  // クリックで選択トグル
+  STATE.selections.clear();
+  qsa('.imgbox').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const id = el.getAttribute('data-imgid');
+      if(STATE.selections.has(id)){
+        STATE.selections.delete(id);
+        el.classList.remove('selected');
+      }else{
+        STATE.selections.add(id);
+        el.classList.add('selected');
+      }
+    });
+  });
+
+  FOOT.innerHTML = `
+    <button class="btn-secondary" id="backBtn">戻る</button>
+    <div class="grow"></div>
+    <button class="btn" id="commitBtn">決定</button>
+  `;
+
+  // 「決定」ボタンの処理（そのまま）
+  qs('#commitBtn').onclick = commitPhase;
+
+  // 「戻る」ボタンの処理を追加
+  qs('#backBtn').onclick = () => {
+    // フェーズ1→前のバッチ／フェーズ2→フェーズ1に戻る
+    if (STATE.phase === 2) {
+      // フェーズ2 → フェーズ1に戻す
+      STATE.phase = 1;
+      STATE.remainingInBatch = STATE.currentBatch.slice(); // 元の10枚を再表示
+      renderBatch(scene);
+    } else if (STATE.batchIndex > 0) {
+      // 前のバッチに戻る
+      STATE.batchIndex--;
+      STATE.phase = 1;
+      STATE.currentBatch = STATE.currentBatches[STATE.batchIndex].slice();
+      STATE.remainingInBatch = STATE.currentBatch.slice();
+      renderBatch(scene);
+    } else {
+      alert("これ以上戻れません。");
+    }
+  };
+}
+
+function methodLabel(m){
+  if(m==='a') return '① 文章そのまま';
+  if(m==='b') return '② 要素そのまま';
+  if(m==='c') return '③ 要素→簡潔文';
+  return m;
+}
+
+function startSurvey(){
+  STATE.started = true;
+  loadLocalQueue(); // 途中中断からの復帰にも耐える
+  STATE.sceneOrder = shuffle(SCENES.map((_,i)=>i));
+  STATE.sceneIndex = 0;
+  startScene();
+}
+
+function startScene(){
+  STATE.batchIndex = 0;
+  STATE.phase = 1;
+
+  const scene = SCENES[STATE.sceneOrder[STATE.sceneIndex]];
+  // 30枚混合→ランダム→10枚×3バッチ
+  const deck = buildSceneDeck(scene);
+  const batches = chunk(deck, 10);
+  STATE.currentBatches = batches; // 3つ想定
+  STATE.currentBatch = batches[STATE.batchIndex].slice();
+  STATE.remainingInBatch = STATE.currentBatch.slice();
+  renderBatch(scene);
+}
+
+function commitPhase(){
+  const scene = SCENES[STATE.sceneOrder[STATE.sceneIndex]];
+  const nowISO = new Date().toISOString();
+
+  if(STATE.phase===1){
+    // Positive を確定
+    const positiveIds = Array.from(STATE.selections);
+    const posItems = STATE.currentBatch.filter(x=>positiveIds.includes(x.imgId));
+    const payload = {
+      type: "rating",
+      participantId: PARTICIPANT_ID,
+      sceneId: scene.id,
+      sceneTitle: scene.title,
+      batchIndex: STATE.batchIndex,
+      phase: "positive",
+      ratings: posItems.map(x=>({imgId:x.imgId, method:x.method, label:"positive"})),
+      timestamp: nowISO,
+      userAgent: navigator.userAgent
+    };
+    submitRatings(payload);
+
+    // 残し → Phase2へ
+    STATE.remainingInBatch = STATE.currentBatch.filter(x=>!positiveIds.includes(x.imgId));
+    STATE.phase = 2;
+    renderBatch(scene);
+    return;
+  }
+
+  // phase===2 : Negative を確定、残りを Neutral
+  const negativeIds = Array.from(STATE.selections);
+  const negItems = STATE.remainingInBatch.filter(x=>negativeIds.includes(x.imgId));
+  const neuItems = STATE.remainingInBatch.filter(x=>!negativeIds.includes(x.imgId));
+
+  const payloadNeg = {
+    type: "rating",
+    participantId: PARTICIPANT_ID,
+    sceneId: scene.id,
+    sceneTitle: scene.title,
+    batchIndex: STATE.batchIndex,
+    phase: "negative",
+    ratings: negItems.map(x=>({imgId:x.imgId, method:x.method, label:"negative"})),
+    timestamp: new Date().toISOString(),
+    userAgent: navigator.userAgent
+  };
+  submitRatings(payloadNeg);
+
+  const payloadNeu = {
+    type: "rating",
+    participantId: PARTICIPANT_ID,
+    sceneId: scene.id,
+    sceneTitle: scene.title,
+    batchIndex: STATE.batchIndex,
+    phase: "neutral",
+    ratings: neuItems.map(x=>({imgId:x.imgId, method:x.method, label:"neutral"})),
+    timestamp: new Date().toISOString(),
+    userAgent: navigator.userAgent
+  };
+  submitRatings(payloadNeu);
+
+  // 次のバッチへ
+  STATE.batchIndex++;
+  if(STATE.batchIndex >= 3){
+    // 次のシーンへ
+    nextSceneOrFinish();
+  }else{
+    const scene = SCENES[STATE.sceneOrder[STATE.sceneIndex]];
+    STATE.phase = 1;
+    STATE.currentBatch = STATE.currentBatches[STATE.batchIndex].slice();
+    STATE.remainingInBatch = STATE.currentBatch.slice();
+    renderBatch(scene);
+  }
+}
+
+function nextSceneOrFinish(){
+  STATE.sceneIndex++;
+  if(STATE.sceneIndex >= SCENES.length){
+    renderFinish();
+    flushQueue(); // 送れるものは送っておく
+    return;
+  }
+  renderSceneGap();
+}
+
+function renderSceneGap(){
+  const nextScene = SCENES[STATE.sceneOrder[STATE.sceneIndex]];
+  APP.innerHTML = `
+    <div class="notice ok">
+      <strong>シーン完了！</strong> 次は <strong>${nextScene.title}</strong> です。<br/>
+      <span class="small">同様に 10枚×3バッチで評価します。</span>
+    </div>
+  `;
+  FOOT.innerHTML = `
+    <div class="grow"></div>
+    <button class="btn" id="goNext">次のシーンへ</button>
+  `;
+  qs('#goNext').onclick = startScene;
+}
+
+function renderFinish(){
+  const total = SCENES.length * 30;
+  APP.innerHTML = `
+    <div class="notice ok">
+      <p><strong>すべての評価が完了しました。ご協力ありがとうございました！</strong></p>
+      <p class="small">送信キュー：${STATE.log.filter(x=>x.sent).length} 件送信済み / ${STATE.log.length} 件（未送信は再読込後に自動再送されます）</p>
+    </div>
+    <div class="hr"></div>
+    <p class="muted">合計画像数：${total}（5シーン × 各30枚）</p>
+    <div class="row">
+      <button class="btn" id="retrySend">未送信を再送</button>
+      <button class="btn btn-secondary" id="restart">最初からやり直す</button>
+    </div>
+  `;
+  FOOT.innerHTML = `<span class="small">このウィンドウを閉じても構いません。未送信データはブラウザに保存され、次回アクセス時に再送されます。</span>`;
+  qs('#retrySend').onclick = flushQueue;
+  qs('#restart').onclick = ()=>location.reload();
+}
+
+// 初期化
+renderIntro();
+
+</script>
 </body>
 </html>
-
