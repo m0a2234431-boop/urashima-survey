@@ -38,13 +38,14 @@
   .imgbox{position:relative;border-radius:12px;overflow:hidden;border:2px solid #21283a;background:#0e1118;cursor:pointer;transition:border-color .12s ease, transform .06s ease}
   .imgbox:hover{transform:translateY(-1px)}
   .imgbox.selected{border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(127,200,255,.25) inset}
-  .imgbox img{
-    display:block;
-    width:200px;       /* 横の大きさを固定 */
-    height:200px;      /* 縦の大きさを固定 */
-    object-fit:contain; /* 画像全体を切らずに表示 */
-    background:#0b0f17; /* 背景を暗くして見やすく */
-  }
+  .imgbox img {
+  display: block;
+  width: 100%;          /* 親要素にフィット */
+  height: auto;         /* 縦横比を保つ */
+  object-fit: contain;  /* 画像全体を切らずに収める */
+  background: #0b0f17;  /* 背景色 */
+  border-radius: 0;     /* 角丸が不要なら消す */
+}
   .tag{position:absolute;left:8px;top:8px;background:#0f1522;color:#cfe7ff;border:1px solid #2a3a58;border-radius:999px;padding:4px 8px;font-size:12px}
   .badge{display:inline-block;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700;margin-right:8px}
   .b-ok{background:rgba(60,207,145,.18);border:1px solid rgba(60,207,145,.5);color:#c8ffe7}
@@ -600,3 +601,4 @@ renderIntro();
 </script>
 </body>
 </html>
+
