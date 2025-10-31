@@ -1,105 +1,42 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>挿絵生成・描写精度アンケート（浦島太郎）</title>
-<style>
-/* スタイル部分は全てそのまま */
-  :root{
-    --bg:#0b0c10; --panel:#151821; --ink:#e8ecf1; --muted:#a7b0bd; --accent:#5aa9e6; --accent-2:#7fc8ff;
-    --ok:#3ccf91; --ng:#ff6b6b; --neutral:#c3cad4;
-    --radius:14px;
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto, "Hiragino Kaku Gothic ProN","Meiryo",sans-serif}
-  .wrap{max-width:1100px;margin:0 auto;padding:24px}
-  .card{background:var(--panel);border:1px solid #232738;border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,.25)}
-  .header{padding:20px 22px;border-bottom:1px solid #232738}
-  .body{padding:22px}
-  h1{margin:0 0 4px 0;font-size:24px}
-  p{line-height:1.7}
-  .muted{color:var(--muted)}
-  .btn{appearance:none;border:0;border-radius:12px;padding:12px 18px;background:var(--accent);color:#071018;font-weight:700;cursor:pointer;box-shadow:0 8px 20px rgba(90,169,230,.35);transition:transform .04s ease, box-shadow .2s ease}
-  .btn:hover{transform:translateY(-1px);box-shadow:0 12px 24px rgba(90,169,230,.45)}
-  .btn:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
-  .btn-secondary{background:#2a3142;color:#e8ecf1;box-shadow:none}
-  .btn-ghost{background:transparent;color:var(--muted);border:1px solid #30384a}
-  .row{display:flex;gap:12px;flex-wrap:wrap}
-  .grow{flex:1}
-  .right{margin-left:auto}
-  .notice{padding:12px 14px;border-radius:12px;background:#10131a;border:1px solid #273044;color:#dbe6f6}
-  .notice.ok{border-color:#1f6a4c;background:rgba(60,207,145,.08)}
-  .notice.ng{border-color:#5e2b2b;background:rgba(255,107,107,.08)}
-  .scene-text{padding:14px 16px;border-radius:12px;background:#0f131c;border:1px dashed #2e3a4f;white-space:pre-wrap}
-  .grid{display:grid;grid-template-columns:repeat(5, 1fr);gap:12px;margin-top:14px}
-  @media (max-width:1024px){.grid{grid-template-columns:repeat(4,1fr)}}
-  @media (max-width:780px){.grid{grid-template-columns:repeat(3,1fr)}}
-  @media (max-width:560px){.grid{grid-template-columns:repeat(2,1fr)}}
-  .imgbox{position:relative;border-radius:12px;overflow:hidden;border:2px solid #21283a;background:#0e1118;cursor:pointer;transition:border-color .12s ease, transform .06s ease}
-  .imgbox:hover{transform:translateY(-1px)}
-  .imgbox.selected{border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(127,200,255,.25) inset}
-  .imgbox img {
-  display: block;
-  width: 100%;          
-  height: auto;         
-  object-fit: contain;  
-  background: #0b0f17;  
-  border-radius: 0;     
-}
-  .tag{position:absolute;left:8px;top:8px;background:#0f1522;color:#cfe7ff;border:1px solid #2a3a58;border-radius:999px;padding:4px 8px;font-size:12px}
-  .badge{display:inline-block;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700;margin-right:8px}
-  .b-ok{background:rgba(60,207,145,.18);border:1px solid rgba(60,207,145,.5);color:#c8ffe7}
-  .b-ng{background:rgba(255,107,107,.18);border:1px solid rgba(255,107,107,.45);color:#ffd6d6}
-  .b-neu{background:rgba(195,202,212,.18);border:1px solid rgba(195,202,212,.45);color:#eaedf2}
-  .footer{padding:14px 16px;border-top:1px solid #232738;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-  .small{font-size:12px;color:#9fb1c6}
-  .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;padding:2px 6px;border:1px solid #334055;border-radius:6px;background:#0e1219;color:#c9d6e7}
-  .hr{border-top:1px dashed #2c3446;margin:18px 0}
-  .pill{display:inline-block;padding:8px 12px;border-radius:999px;background:#0e1420;border:1px solid #2b374c;color:#cfe1ff}
-  .tag { display: none !important; }
-</style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <div class="header">
-        <h1>挿絵生成・描写精度アンケート</h1>
-        <div class="muted">テーマ：挿絵生成における入力形式の違いによる描写精度の分析</div>
-      </div>
+  <div class="wrap">
+    <div class="card">
+      <div class="header">
+        <h1>挿絵生成・描写精度アンケート</h1>
+        <div class="muted">テーマ：挿絵生成における入力形式の違いによる描写精度の分析</div>
+      </div>
       
-      <form action="https://script.google.com/macros/s/AKfycbz3jqvv2SYsc7-e9XP7Q5lJEQcFN4rknGluz85o8L3ilQxnQ3fKSFzfZJqhjIDvn41goQ/exec" method="GET">
+      <form action="【新しいGASのURLをここに貼り付け】" method="POST">
 
-        <div class="body" id="app">
-            
-            <div class="notice">
-              <p>このアンケートは、通信エラー解決のため、**「名前」と「決定」ボタンによるデータ送信のみ**に機能が制限されています。本来の段階的な評価ロジックは機能しません。</p>
-            </div>
-            
-            <div class="hr"></div>
+        <div class="body" id="app">
+          <div class="notice">
+            <p>このフォームは、データ送信機能が動作するかをテストするためのものです。</p>
+          </div>
+          
+          <div class="hr"></div>
 
-            <p><strong>お名前を入力してください：</strong></p>
-            <input type="text" name="participantName" placeholder="例：山田太郎" style="width:100%;padding:10px;font-size:16px;border-radius:8px;border:1px solid #333;background:#0e1219;color:#fff;margin-bottom:10px;" required>
+          <p><strong>お名前を入力してください：</strong></p>
+          <input type="text" name="participantName" placeholder="例：山田太郎" style="width:100%;padding:10px;font-size:16px;border-radius:8px;border:1px solid #333;background:#0e1219;color:#fff;margin-bottom:10px;" required>
 
-            <div class="hr"></div>
+          <div class="hr"></div>
 
-            <div class="notice ok">
-                <p><strong>このフォームは、アンケートのデータ送信機能が動作するかをテストするためのものです。</strong></p>
-                <p>お名前を入力し、「決定（データ送信）」ボタンを押してください。</p>
-            </div>
+          <div class="notice ok">
+              <p>お名前を入力し、「決定（データ送信）」ボタンを押してください。</p>
+          </div>
 
-        </div>
-        <div class="footer" id="footer">
-            <div class="row">
-                <div class="grow"></div>
-                <button class="btn" type="submit">決定（データ送信）</button>
-            </div>
-        </div>
+        </div>
+        <div class="footer" id="footer">
+          <div class="row">
+              <div class="grow"></div>
+              <button class="btn" type="submit">決定（データ送信）</button>
+          </div>
+        </div>
       </form>
-    </div>
-  </div>
-
+    </div>
+  </div>
 </body>
 </html>
-
-
