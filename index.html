@@ -3,7 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>挿絵・描写精度アンケート（浦島太郎）</title>
+
+  <!-- ✅ タイトルを変更 -->
+  <title>挿絵・描写精度アンケート（浦島太郎）2</title>
+
+  <!-- ✅ ブラウザキャッシュを無効化 -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
   <style>
     :root{
       --bg:#0b0c10; --panel:#151821; --ink:#e8ecf1; --muted:#a7b0bd; --accent:#5aa9e6; --ok:#3ccf91; --warn:#ffcc66; --err:#ff6b6b;
@@ -35,118 +43,140 @@
     .tag{display:inline-block;background:#0f1117;border:1px solid rgba(255,255,255,.08);padding:4px 8px;border-radius:999px;color:var(--muted);font-size:12px}
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
     .tiny{font-size:12px}
-    .danger{background:var(--err)!important;color:white}
     .ghost{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--ink)}
     .hidden{display:none}
     .foot{display:flex;gap:8px;align-items:center;justify-content:flex-end}
-    .note{font-size:12px;color:var(--muted)}
   </style>
 </head>
 <body>
   <div class="wrap">
     <div id="app" class="card pad">
+      <!-- 説明セクション -->
       <section id="stepIntro">
-        <h1>挿絵・描写精度アンケート（浦島太郎）</h1>
+        <h1>挿絵・描写精度アンケート（浦島太郎）2</h1>
         <p>
-          本アンケートでは、<strong>浦島太郎</strong>の本文を5つのシーンに分割し、<strong>3つの手法</strong>で生成された挿絵（各手法10枚、合計30枚/シーン）を
-          <strong>「描写できている」「どちらでもない」「描写できていない」</strong>のいずれかで評価していただきます。<br>
-          シーンや画像の提示順は<strong>ランダム</strong>です。全5シーンの評価終了後、送信ボタンで回答を保存します。
+          本アンケートでは、<strong>浦島太郎</strong>を5つのシーンに分割し、<strong>3つの手法</strong>で生成された挿絵（各10枚・計30枚）を
+          <strong>「描写できている」「どちらでもない」「描写できていない」</strong>の3段階で評価していただきます。
         </p>
-        <div class="space"></div>
         <div class="grid2">
           <div>
-            <label>回答者氏名（必須）<input id="responderName" type="text" placeholder="例）山田太郎" /></label>
+            <label>回答者氏名（必須）<input id="responderName" type="text" placeholder="例）山田太郎"></label>
           </div>
           <div>
-            <label>同意確認<span class="tiny muted">（研究目的で集計し、個人を特定する目的では利用しません）</span>
-              <div class="row"><label class="tiny"><input type="checkbox" id="consentCheck"/> 研究協力に同意します</label></div>
+            <label>同意確認
+              <div class="row"><label class="tiny"><input type="checkbox" id="consentCheck"> 研究協力に同意します</label></div>
             </label>
           </div>
         </div>
         <div class="foot">
-          <button class="ghost" id="btnLoadDraft">途中保存から復元</button>
           <button id="btnStart" disabled>次へ（開始）</button>
         </div>
       </section>
 
+      <!-- アンケート本体 -->
       <section id="stepSurvey" class="hidden">
-        <div class="row" style="align-items:flex-start">
-          <div style="flex:1 1 380px">
-            <div class="sceneBox">
-              <div class="sceneTitle">シーン（ランダム表示）</div>
-              <p id="sceneText" style="white-space:pre-wrap"></p>
-              <div class="row">
-                <span class="tag" id="sceneTag"></span>
-                <span class="tag" id="methodTag"></span>
-                <span class="tag" id="counterTag"></span>
-              </div>
-            </div>
-            <div class="space"></div>
-            <div>
-              <div class="progress"><div class="bar" id="progressBar"></div></div>
-              <div class="tiny muted" id="progressText" style="margin-top:6px"></div>
-            </div>
-          </div>
-
-          <div style="flex:1 1 520px">
-            <p class="muted">画像を評価してください。</p>
-            <div class="imgWrap"><img id="targetImg" alt="evaluation target"/></div>
-            <div class="choices">
-              <label><input type="checkbox" name="rating" value="描写できている"> 描写できている</label>
-              <label><input type="checkbox" name="rating" value="どちらでもない"> どちらでもない</label>
-              <label><input type="checkbox" name="rating" value="描写できていない"> 描写できていない</label>
-            </div>
-            <div class="controls">
-              <button class="ghost" id="btnBack">戻る</button>
-              <div class="row">
-                <button class="ghost" id="btnSaveLocal" title="途中保存（ローカル）">途中保存</button>
-                <button id="btnNext">次へ</button>
-              </div>
-            </div>
-            <div class="tiny muted" id="warnMsg"></div>
-          </div>
+        <div class="sceneBox">
+          <div class="sceneTitle">シーン</div>
+          <p id="sceneText"></p>
+          <span class="tag" id="methodTag"></span>
+          <span class="tag" id="counterTag"></span>
         </div>
+        <p class="muted">画像を評価してください。</p>
+        <div class="imgWrap"><img id="targetImg" alt="評価画像"></div>
+        <div class="choices">
+          <label><input type="checkbox" name="rating" value="描写できている"> 描写できている</label>
+          <label><input type="checkbox" name="rating" value="どちらでもない"> どちらでもない</label>
+          <label><input type="checkbox" name="rating" value="描写できていない"> 描写できていない</label>
+        </div>
+        <div class="controls">
+          <button class="ghost" id="btnBack">戻る</button>
+          <button id="btnNext">次へ</button>
+        </div>
+        <p id="warnMsg" class="tiny muted"></p>
       </section>
 
+      <!-- 完了画面 -->
       <section id="stepFinish" class="hidden center">
         <h1>ご協力ありがとうございました！</h1>
-        <p>全ての評価が完了し、回答の送信が完了しました。</p>
-        <p class="tiny muted">このウィンドウは閉じていただいて構いません。</p>
+        <p>全ての評価が完了しました。</p>
       </section>
     </div>
   </div>
 
-  <script>
-  const GAS_ENDPOINT = "https://script.google.com/macros/s/PASTE_YOUR_DEPLOYED_WEB_APP_URL_HERE/exec";
+<script>
+const scenes = [1,2,3,4,5].map(num => ({
+  id:`S${num}`,
+  text:`シーン${num}の本文をここに記入してください。`,
+  methods:[
+    {name:"方法A：原文そのまま",images:Array.from({length:10},(_,i)=>`urashima-survey/img/scene${num}/a_${String(i+1).padStart(2,'0')}.png`)},
+    {name:"方法B：抽出要素",images:Array.from({length:10},(_,i)=>`urashima-survey/img/scene${num}/b_${String(i+1).padStart(2,'0')}.png`)},
+    {name:"方法C：要約ベース",images:Array.from({length:10},(_,i)=>`urashima-survey/img/scene${num}/c_${String(i+1).padStart(2,'0')}.png`)}
+  ]
+}));
 
-  const scenes = [1,2,3,4,5].map(num => ({
-    id:`S${num}`,
-    text:`シーン${num}の本文をここに記入してください。`,
-    methods:[
-      {name:"方法A：原文そのまま",images:Array.from({length:10},(_,i)=>`urashima-survey/img/scene${num}/a_${String(i+1).padStart(2,'0')}.png`)},
-      {name:"方法B：抽出要素",images:Array.from({length:10},(_,i)=>`urashima-survey/img/scene${num}/b_${String(i+1).padStart(2,'0')}.png`)},
-      {name:"方法C：要約ベース",images:Array.from({length:10},(_,i)=>`urashima-survey/img/scene${num}/c_${String(i+1).padStart(2,'0')}.png`)}
-    ]
-  }));
+// --- 入力監視 ---
+const btnStart=document.getElementById("btnStart");
+const nameInput=document.getElementById("responderName");
+const consentCheck=document.getElementById("consentCheck");
+function updateStartButton(){
+  btnStart.disabled = !(nameInput.value.trim() && consentCheck.checked);
+}
+nameInput.addEventListener("input",updateStartButton);
+consentCheck.addEventListener("change",updateStartButton);
 
-  // --- ボタン有効化処理 ---
-  const btnStart = document.getElementById("btnStart");
-  const nameInput = document.getElementById("responderName");
-  const consentCheck = document.getElementById("consentCheck");
+// --- アンケート進行 ---
+const stepIntro=document.getElementById("stepIntro");
+const stepSurvey=document.getElementById("stepSurvey");
+const stepFinish=document.getElementById("stepFinish");
+const targetImg=document.getElementById("targetImg");
+const sceneText=document.getElementById("sceneText");
+const methodTag=document.getElementById("methodTag");
+const counterTag=document.getElementById("counterTag");
+const ratingBoxes=document.querySelectorAll("input[name='rating']");
+const warnMsg=document.getElementById("warnMsg");
 
-  function updateStartButton() {
-    const nameOk = nameInput.value.trim().length > 0;
-    const consentOk = consentCheck.checked;
-    btnStart.disabled = !(nameOk && consentOk);
-  }
-  nameInput.addEventListener("input", updateStartButton);
-  consentCheck.addEventListener("change", updateStartButton);
+let sceneIndex=0, imageIndex=0, currentImages=[];
+const sceneOrder=scenes.sort(()=>Math.random()-0.5);
 
-  // --- 開始ボタン（動作テスト用） ---
-  btnStart.addEventListener("click", () => {
-    alert("開始します！（ここにアンケート本体処理を入れる）");
-  });
-  </script>
+function randomizeScene(){
+  const s=sceneOrder[sceneIndex];
+  const imgs=[];
+  s.methods.forEach(m=>m.images.forEach(u=>imgs.push({method:m.name,url:u})));
+  currentImages=imgs.sort(()=>Math.random()-0.5);
+}
+
+function render(){
+  const s=sceneOrder[sceneIndex];
+  const img=currentImages[imageIndex];
+  sceneText.textContent=s.text;
+  methodTag.textContent=img.method;
+  counterTag.textContent=`${imageIndex+1}/30`;
+  targetImg.src=img.url;
+  ratingBoxes.forEach(b=>b.checked=false);
+  warnMsg.textContent="";
+}
+
+btnStart.addEventListener("click",()=>{
+  stepIntro.classList.add("hidden");
+  stepSurvey.classList.remove("hidden");
+  randomizeScene();
+  render();
+});
+
+document.getElementById("btnNext").addEventListener("click",()=>{
+  const chosen=[...ratingBoxes].find(b=>b.checked);
+  if(!chosen){warnMsg.textContent="選択してください";return;}
+  imageIndex++;
+  if(imageIndex<30){render();return;}
+  sceneIndex++;
+  if(sceneIndex<5){imageIndex=0;randomizeScene();render();return;}
+  stepSurvey.classList.add("hidden");
+  stepFinish.classList.remove("hidden");
+});
+
+document.getElementById("btnBack").addEventListener("click",()=>{
+  if(imageIndex>0){imageIndex--;render();}
+});
+</script>
 </body>
 </html>
-
