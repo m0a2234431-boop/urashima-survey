@@ -36,7 +36,6 @@
     .sceneBox{background:#0f1117;border:1px dashed rgba(255,255,255,.1);
       border-radius:12px;padding:14px}
     .sceneTitle{font-weight:800;letter-spacing:.04em;margin-bottom:6px}
-    /* ✅ 画像サイズを一律に固定 */
     .imgWrap{
       display:inline-flex;
       justify-content:center;
@@ -45,13 +44,13 @@
       border-radius:16px;
       border:1px solid rgba(255,255,255,.08);
       padding:10px;
-      width:600px;   /* 固定幅 */
-      height:400px;  /* 固定高さ */
+      width:600px;
+      height:400px;
     }
     img{
       width:100%;
       height:100%;
-      object-fit:contain; /* アスペクト比を維持して収める */
+      object-fit:contain;
       border-radius:12px;
       display:block;
     }
@@ -121,6 +120,10 @@
   </div>
 
 <script>
+// ✅ あなたのGASのWebアプリURLをここに貼り付けてください
+const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzDMgRX1_lChlS2RrBiYV81hW9tgTWpndVz3UqmL5imrAKlUwjdWvTMjKUpHUcHiKAe/exec";
+
+// ======== シーン構成 ========
 const scenes = [
   {
     id: "S1",
@@ -130,15 +133,10 @@ const scenes = [
       {name:"方法B：抽出要素",images:Array.from({length:10},(_,i)=>`img/scene1/b_${String(i+1).padStart(2,'0')}.png`)},
       {name:"方法C：要約ベース",images:Array.from({length:10},(_,i)=>`img/scene1/c_${String(i+1).padStart(2,'0')}.png`)}
     ]
-  },
-  /*
-  {id:"S2",text:`シーン2の本文`,methods:[...]},
-  {id:"S3",text:`シーン3の本文`,methods:[...]},
-  {id:"S4",text:`シーン4の本文`,methods:[...]},
-  {id:"S5",text:`シーン5の本文`,methods:[...]}
-  */
+  }
 ];
 
+// ======== 入力確認 ========
 const btnStart=document.getElementById("btnStart");
 const nameInput=document.getElementById("responderName");
 const consentCheck=document.getElementById("consentCheck");
@@ -148,6 +146,7 @@ function updateStartButton(){
 nameInput.addEventListener("input",updateStartButton);
 consentCheck.addEventListener("change",updateStartButton);
 
+// ======== 要素取得 ========
 const stepIntro=document.getElementById("stepIntro");
 const stepSurvey=document.getElementById("stepSurvey");
 const stepFinish=document.getElementById("stepFinish");
@@ -161,6 +160,7 @@ const warnMsg=document.getElementById("warnMsg");
 let sceneIndex=0,imageIndex=0,currentImages=[];
 const sceneOrder=scenes.sort(()=>Math.random()-0.5);
 
+// ======== シーンランダム化 ========
 function randomizeScene(){
   const s=sceneOrder[sceneIndex];
   const imgs=[];
@@ -168,6 +168,7 @@ function randomizeScene(){
   currentImages=imgs.sort(()=>Math.random()-0.5);
 }
 
+// ======== 画面表示更新 ========
 function render(){
   const s=sceneOrder[sceneIndex];
   const img=currentImages[imageIndex];
@@ -179,6 +180,21 @@ function render(){
   warnMsg.textContent="";
 }
 
+// ======== 回答データをGASに送信 ========
+async function saveResponse(name, scene, method, image, rating) {
+  const payload = { name, scene, method, image, rating };
+  try {
+    await fetch(GAS_ENDPOINT, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: { "Content-Type": "application/json" }
+    });
+  } catch (err) {
+    console.error("送信エラー:", err);
+  }
+}
+
+// ======== 開始ボタン ========
 btnStart.addEventListener("click",()=>{
   stepIntro.classList.add("hidden");
   stepSurvey.classList.remove("hidden");
@@ -186,9 +202,18 @@ btnStart.addEventListener("click",()=>{
   render();
 });
 
-document.getElementById("btnNext").addEventListener("click",()=>{
+// ======== 次へボタン ========
+document.getElementById("btnNext").addEventListener("click", async ()=>{
   const chosen=[...ratingBoxes].find(b=>b.checked);
   if(!chosen){warnMsg.textContent="選択してください";return;}
+
+  const current = currentImages[imageIndex];
+  const s = sceneOrder[sceneIndex];
+  const name = nameInput.value.trim();
+
+  // ✅ スプレッドシートへ送信
+  await saveResponse(name, s.id, current.method, current.url, chosen.value);
+
   imageIndex++;
   if(imageIndex<30){render();return;}
   sceneIndex++;
@@ -197,6 +222,7 @@ document.getElementById("btnNext").addEventListener("click",()=>{
   stepFinish.classList.remove("hidden");
 });
 
+// ======== 戻るボタン ========
 document.getElementById("btnBack").addEventListener("click",()=>{
   if(imageIndex>0){imageIndex--;render();}
 });
