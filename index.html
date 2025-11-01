@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>挿絵・描写精度アンケート（浦島太郎）3</title>
+  <title>挿絵・描写精度アンケート（浦島太郎）2</title>
 
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
@@ -36,6 +36,7 @@
     .sceneBox{background:#0f1117;border:1px dashed rgba(255,255,255,.1);
       border-radius:12px;padding:14px}
     .sceneTitle{font-weight:800;letter-spacing:.04em;margin-bottom:6px}
+    /* ✅ 画像サイズを一律に固定 */
     .imgWrap{
       display:inline-flex;
       justify-content:center;
@@ -44,10 +45,13 @@
       border-radius:16px;
       border:1px solid rgba(255,255,255,.08);
       padding:10px;
+      width:600px;   /* 固定幅 */
+      height:400px;  /* 固定高さ */
     }
     img{
-      max-width:50%;
-      height:auto;
+      width:100%;
+      height:100%;
+      object-fit:contain; /* アスペクト比を維持して収める */
       border-radius:12px;
       display:block;
     }
@@ -70,7 +74,7 @@
   <div class="wrap">
     <div id="app" class="card pad">
       <section id="stepIntro">
-        <h1>挿絵・描写精度アンケート（浦島太郎）3</h1>
+        <h1>挿絵・描写精度アンケート（浦島太郎）2</h1>
         <p>
           本アンケートでは、<strong>浦島太郎</strong>を5つのシーンに分割し、<strong>3つの手法</strong>で生成された挿絵（各10枚・計30枚）を
           <strong>「描写できている」「どちらでもない」「描写できていない」</strong>の3段階で評価していただきます。
@@ -128,26 +132,10 @@ const scenes = [
     ]
   },
   /*
-  {
-    id: "S2",
-    text: `シーン2の本文をここに記入してください。`,
-    methods: [...]
-  },
-  {
-    id: "S3",
-    text: `シーン3の本文をここに記入してください。`,
-    methods: [...]
-  },
-  {
-    id: "S4",
-    text: `シーン4の本文をここに記入してください。`,
-    methods: [...]
-  },
-  {
-    id: "S5",
-    text: `シーン5の本文をここに記入してください。`,
-    methods: [...]
-  }
+  {id:"S2",text:`シーン2の本文`,methods:[...]},
+  {id:"S3",text:`シーン3の本文`,methods:[...]},
+  {id:"S4",text:`シーン4の本文`,methods:[...]},
+  {id:"S5",text:`シーン5の本文`,methods:[...]}
   */
 ];
 
@@ -204,7 +192,7 @@ document.getElementById("btnNext").addEventListener("click",()=>{
   imageIndex++;
   if(imageIndex<30){render();return;}
   sceneIndex++;
-  if(sceneIndex<1){imageIndex=0;randomizeScene();render();return;} // ← scene1のみ
+  if(sceneIndex<1){imageIndex=0;randomizeScene();render();return;} // scene1のみ
   stepSurvey.classList.add("hidden");
   stepFinish.classList.remove("hidden");
 });
@@ -215,4 +203,3 @@ document.getElementById("btnBack").addEventListener("click",()=>{
 </script>
 </body>
 </html>
-
