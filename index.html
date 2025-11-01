@@ -1,23 +1,120 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  //<title>アンケートへ移動中</title>
-  <script>
-    window.onload = function() {
-      const urls = [
-        "https://forms.gle/YgCa9iZUn6pREgUT6",
-        "https://forms.gle/UkXHDxEBeXXP4ttA6"
-      ];
-      const i = Math.floor(Math.random() * urls.length);
-      window.location.href = urls[i];
-    };
-  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>挿絵・描写精度アンケート（浦島太郎）</title>
+  <style>
+    :root{
+      --bg:#0b0c10; --panel:#151821; --ink:#e8ecf1; --muted:#a7b0bd; --accent:#5aa9e6; --ok:#3ccf91; --warn:#ffcc66; --err:#ff6b6b;
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,"Hiragino Kaku Gothic ProN","Meiryo",sans-serif}
+    .wrap{max-width:1050px;margin:0 auto;padding:24px}
+    .card{background:var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+    .pad{padding:20px}
+    h1{font-size:clamp(20px,2.4vw,28px);margin:0 0 12px}
+    p{color:var(--muted);line-height:1.7}
+    label{display:block;margin:10px 0;color:var(--ink)}
+    input[type="text"]{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#0f1117;color:var(--ink)}
+    button{appearance:none;border:0;background:var(--accent);color:#071018;padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer}
+    button[disabled]{opacity:.5;cursor:not-allowed}
+    .row{display:flex;gap:14px;flex-wrap:wrap}
+    .space{height:12px}
+    .muted{color:var(--muted)}
+    .center{text-align:center}
+    .sceneBox{background:#0f1117;border:1px dashed rgba(255,255,255,.1);border-radius:12px;padding:14px}
+    .sceneTitle{font-weight:800;letter-spacing:.04em;margin-bottom:6px}
+    .imgWrap{display:flex;justify-content:center;align-items:center;background:#0b0d13;border-radius:16px;border:1px solid rgba(255,255,255,.08);min-height:320px}
+    img{max-width:100%;height:auto;border-radius:12px}
+    .controls{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px}
+    .choices{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+    .progress{height:10px;background:#0f1117;border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+    .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--ok),#5aa9e6)}
+    .tag{display:inline-block;background:#0f1117;border:1px solid rgba(255,255,255,.08);padding:4px 8px;border-radius:999px;color:var(--muted);font-size:12px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .tiny{font-size:12px}
+    .danger{background:var(--err)!important;color:white}
+    .ghost{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--ink)}
+    .hidden{display:none}
+    .foot{display:flex;gap:8px;align-items:center;justify-content:flex-end}
+    .note{font-size:12px;color:var(--muted)}
+  </style>
 </head>
 <body>
-  <p>ランダムにフォームへ移動中です...</p>
+  <div class="wrap">
+    <div id="app" class="card pad">
+      <section id="stepIntro">
+        <h1>挿絵・描写精度アンケート（浦島太郎）</h1>
+        <p>
+          本アンケートでは、<strong>浦島太郎</strong>の本文を5つのシーンに分割し、<strong>3つの手法</strong>で生成された挿絵（各手法10枚、合計30枚/シーン）を
+          <strong>「描写できている」「どちらでもない」「描写できていない」</strong>のいずれかで評価していただきます。<br>
+          シーンや画像の提示順は<strong>ランダム</strong>です。全5シーンの評価終了後、送信ボタンで回答を保存します。
+        </p>
+        <div class="space"></div>
+        <div class="grid2">
+          <div>
+            <label>回答者氏名（必須）<input id="responderName" type="text" placeholder="例）山田太郎" /></label>
+          </div>
+          <div>
+            <label>同意確認<span class="tiny muted">（研究目的で集計し、個人を特定する目的では利用しません）</span><div class="row"><label class="tiny"><input type="checkbox" id="consentCheck"/> 研究協力に同意します</label></div></label>
+          </div>
+        </div>
+        <div class="foot"><button class="ghost" id="btnLoadDraft">途中保存から復元</button><button id="btnStart" disabled>次へ（開始）</button></div>
+      </section>
+
+      <section id="stepSurvey" class="hidden">
+        <div class="row" style="align-items:flex-start">
+          <div style="flex:1 1 380px">
+            <div class="sceneBox">
+              <div class="sceneTitle">シーン（ランダム表示）</div>
+              <p id="sceneText" style="white-space:pre-wrap"></p>
+              <div class="row">
+                <span class="tag" id="sceneTag"></span>
+                <span class="tag" id="methodTag"></span>
+                <span class="tag" id="counterTag"></span>
+              </div>
+            </div>
+            <div class="space"></div>
+            <div><div class="progress"><div class="bar" id="progressBar"></div></div><div class="tiny muted" id="progressText" style="margin-top:6px"></div></div>
+          </div>
+          <div style="flex:1 1 520px">
+            <p class="muted">画像を評価してください。</p>
+            <div class="imgWrap"><img id="targetImg" alt="evaluation target"/></div>
+            <div class="choices">
+              <label><input type="checkbox" name="rating" value="描写できている"> 描写できている</label>
+              <label><input type="checkbox" name="rating" value="どちらでもない"> どちらでもない</label>
+              <label><input type="checkbox" name="rating" value="描写できていない"> 描写できていない</label>
+            </div>
+            <div class="controls"><button class="ghost" id="btnBack">戻る</button><div class="row"><button class="ghost" id="btnSaveLocal" title="途中保存（ローカル）">途中保存</button><button id="btnNext">次へ</button></div></div>
+            <div class="tiny muted" id="warnMsg"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="stepFinish" class="hidden center">
+        <h1>ご協力ありがとうございました！</h1>
+        <p>全ての評価が完了し、回答の送信が完了しました。</p>
+        <p class="tiny muted">このウィンドウは閉じていただいて構いません。</p>
+      </section>
+    </div>
+  </div>
+
+  <script>
+  const GAS_ENDPOINT = "https://script.google.com/macros/s/PASTE_YOUR_DEPLOYED_WEB_APP_URL_HERE/exec";
+
+  const scenes = [1,2,3,4,5].map(num => ({
+    id:`S${num}`,
+    text:`シーン${num}の本文をここに記入してください。`,
+    methods:[
+      {name:"方法A：原文そのまま",images:Array.from({length:10},(_,i)=>`urashima-survey/img/scene${num}/a_${String(i+1).padStart(2,'0')}.png`)},
+      {name:"方法B：抽出要素",images:Array.from({length:10},(_,i)=>`urashima-survey/img/scene${num}/b_${String(i+1).padStart(2,'0')}.png`)},
+      {name:"方法C：要約ベース",images:Array.from({length:10},(_,i)=>`urashima-survey/img/scene${num}/c_${String(i+1).padStart(2,'0')}.png`)}
+    ]
+  }));
+
+  // --- 以下スクリプトは前と同じ（略） ---
+  </script>
 </body>
 </html>
-
-
-
