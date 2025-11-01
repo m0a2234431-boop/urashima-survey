@@ -10,7 +10,7 @@ export default async function handler(req, res) {
 
   if (req.method === "POST") {
     try {
-      const result = await fetch("https://script.google.com/macros/s/AKfycbzkMAvoP7wEPzXZhj0iyOAauVsLWnRwshh-oW5VNY9Jqm9qQS_uTw7nbaD5eXRF7QCs/exec", {
+      const result = await fetch("https://script.google.com/macros/s/AKfycbxCKTPwsPcJybc2xF0_BV1ojVqMIiptBVHaB2Q5IpGsBrW7SqMbdAT--JIvXrcFjiA/exec", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(req.body),
