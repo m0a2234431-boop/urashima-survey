@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>挿絵・描写精度アンケート（浦島太郎）3</title>
+  <title>挿絵・描写精度アンケート（浦島太郎）2</title>
 
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
@@ -11,33 +11,56 @@
 
   <style>
     :root{
-      --bg:#0b0c10; --panel:#151821; --ink:#e8ecf1; --muted:#a7b0bd; --accent:#5aa9e6; --ok:#3ccf91; --warn:#ffcc66; --err:#ff6b6b;
+      --bg:#0b0c10; --panel:#151821; --ink:#e8ecf1; --muted:#a7b0bd; --accent:#5aa9e6; --ok:#3ccf91;
       --radius:14px;
     }
     *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,"Hiragino Kaku Gothic ProN","Meiryo",sans-serif}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+      font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,"Hiragino Kaku Gothic ProN","Meiryo",sans-serif}
     .wrap{max-width:1050px;margin:0 auto;padding:24px}
-    .card{background:var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+    .card{background:var(--panel);border:1px solid rgba(255,255,255,.06);
+      border-radius:var(--radius);box-shadow:0 8px 30px rgba(0,0,0,.3)}
     .pad{padding:20px}
     h1{font-size:clamp(20px,2.4vw,28px);margin:0 0 12px}
     p{color:var(--muted);line-height:1.7}
     label{display:block;margin:10px 0;color:var(--ink)}
-    input[type="text"]{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#0f1117;color:var(--ink)}
-    button{appearance:none;border:0;background:var(--accent);color:#071018;padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer}
+    input[type="text"]{width:100%;padding:12px 14px;border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);background:#0f1117;color:var(--ink)}
+    button{appearance:none;border:0;background:var(--accent);color:#071018;
+      padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer}
     button[disabled]{opacity:.5;cursor:not-allowed}
     .row{display:flex;gap:14px;flex-wrap:wrap}
     .space{height:12px}
     .muted{color:var(--muted)}
     .center{text-align:center}
-    .sceneBox{background:#0f1117;border:1px dashed rgba(255,255,255,.1);border-radius:12px;padding:14px}
+    .sceneBox{background:#0f1117;border:1px dashed rgba(255,255,255,.1);
+      border-radius:12px;padding:14px}
     .sceneTitle{font-weight:800;letter-spacing:.04em;margin-bottom:6px}
-    .imgWrap{display:flex;justify-content:center;align-items:center;background:#0b0d13;border-radius:16px;border:1px solid rgba(255,255,255,.08);min-height:320px}
-    img{max-width:50%;height:auto;border-radius:12px}
-    .controls{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px}
+    /* ✅ 外枠を画像サイズに合わせる */
+    .imgWrap{
+      display:inline-flex;
+      justify-content:center;
+      align-items:center;
+      background:#0b0d13;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      padding:10px;
+    }
+    /* ✅ 画像を半分サイズ＆中央配置 */
+    img{
+      max-width:50%;
+      height:auto;
+      border-radius:12px;
+      display:block;
+    }
+    .controls{display:flex;align-items:center;justify-content:space-between;
+      gap:10px;margin-top:12px}
     .choices{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
-    .progress{height:10px;background:#0f1117;border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+    .progress{height:10px;background:#0f1117;border-radius:999px;overflow:hidden;
+      border:1px solid rgba(255,255,255,.08)}
     .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--ok),#5aa9e6)}
-    .tag{display:inline-block;background:#0f1117;border:1px solid rgba(255,255,255,.08);padding:4px 8px;border-radius:999px;color:var(--muted);font-size:12px}
+    .tag{display:inline-block;background:#0f1117;border:1px solid rgba(255,255,255,.08);
+      padding:4px 8px;border-radius:999px;color:var(--muted);font-size:12px}
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
     .tiny{font-size:12px}
     .ghost{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--ink)}
@@ -48,9 +71,8 @@
 <body>
   <div class="wrap">
     <div id="app" class="card pad">
-      <!-- 説明セクション -->
       <section id="stepIntro">
-        <h1>挿絵・描写精度アンケート（浦島太郎）3</h1>
+        <h1>挿絵・描写精度アンケート（浦島太郎）2</h1>
         <p>
           本アンケートでは、<strong>浦島太郎</strong>を5つのシーンに分割し、<strong>3つの手法</strong>で生成された挿絵（各10枚・計30枚）を
           <strong>「描写できている」「どちらでもない」「描写できていない」</strong>の3段階で評価していただきます。
@@ -65,12 +87,9 @@
             </label>
           </div>
         </div>
-        <div class="foot">
-          <button id="btnStart" disabled>次へ（開始）</button>
-        </div>
+        <div class="foot"><button id="btnStart" disabled>次へ（開始）</button></div>
       </section>
 
-      <!-- アンケート本体 -->
       <section id="stepSurvey" class="hidden">
         <div class="sceneBox">
           <div class="sceneTitle">シーン</div>
@@ -92,7 +111,6 @@
         <p id="warnMsg" class="tiny muted"></p>
       </section>
 
-      <!-- 完了画面 -->
       <section id="stepFinish" class="hidden center">
         <h1>ご協力ありがとうございました！</h1>
         <p>全ての評価が完了しました。</p>
@@ -101,7 +119,7 @@
   </div>
 
 <script>
-const scenes = [1,2,3,4,5].map(num => ({
+const scenes=[1,2,3,4,5].map(num=>({
   id:`S${num}`,
   text:`シーン${num}の本文をここに記入してください。`,
   methods:[
@@ -111,7 +129,6 @@ const scenes = [1,2,3,4,5].map(num => ({
   ]
 }));
 
-// --- 入力監視 ---
 const btnStart=document.getElementById("btnStart");
 const nameInput=document.getElementById("responderName");
 const consentCheck=document.getElementById("consentCheck");
@@ -121,7 +138,6 @@ function updateStartButton(){
 nameInput.addEventListener("input",updateStartButton);
 consentCheck.addEventListener("change",updateStartButton);
 
-// --- アンケート進行 ---
 const stepIntro=document.getElementById("stepIntro");
 const stepSurvey=document.getElementById("stepSurvey");
 const stepFinish=document.getElementById("stepFinish");
@@ -132,7 +148,7 @@ const counterTag=document.getElementById("counterTag");
 const ratingBoxes=document.querySelectorAll("input[name='rating']");
 const warnMsg=document.getElementById("warnMsg");
 
-let sceneIndex=0, imageIndex=0, currentImages=[];
+let sceneIndex=0,imageIndex=0,currentImages=[];
 const sceneOrder=scenes.sort(()=>Math.random()-0.5);
 
 function randomizeScene(){
@@ -177,5 +193,3 @@ document.getElementById("btnBack").addEventListener("click",()=>{
 </script>
 </body>
 </html>
-
-
