@@ -36,7 +36,6 @@
     .sceneBox{background:#0f1117;border:1px dashed rgba(255,255,255,.1);
       border-radius:12px;padding:14px}
     .sceneTitle{font-weight:800;letter-spacing:.04em;margin-bottom:6px}
-    /* ✅ 外枠を画像サイズに合わせる */
     .imgWrap{
       display:inline-flex;
       justify-content:center;
@@ -46,7 +45,6 @@
       border:1px solid rgba(255,255,255,.08);
       padding:10px;
     }
-    /* ✅ 画像を半分サイズ＆中央配置 */
     img{
       max-width:50%;
       height:auto;
@@ -119,15 +117,39 @@
   </div>
 
 <script>
-const scenes=[1,2,3,4,5].map(num=>({
-  id:`S${num}`,
-  text:`シーン${num}の本文をここに記入してください。`,
-  methods:[
-    {name:"方法A：原文そのまま",images:Array.from({length:10},(_,i)=>`img/scene${num}/a_${String(i+1).padStart(2,'0')}.png`)},
-    {name:"方法B：抽出要素",images:Array.from({length:10},(_,i)=>`img/scene${num}/b_${String(i+1).padStart(2,'0')}.png`)},
-    {name:"方法C：要約ベース",images:Array.from({length:10},(_,i)=>`img/scene${num}/c_${String(i+1).padStart(2,'0')}.png`)}
-  ]
-}));
+const scenes = [
+  {
+    id: "S1",
+    text: `シーン1の本文をここに記入してください。`,
+    methods: [
+      {name:"方法A：原文そのまま",images:Array.from({length:10},(_,i)=>`img/scene1/a_${String(i+1).padStart(2,'0')}.png`)},
+      {name:"方法B：抽出要素",images:Array.from({length:10},(_,i)=>`img/scene1/b_${String(i+1).padStart(2,'0')}.png`)},
+      {name:"方法C：要約ベース",images:Array.from({length:10},(_,i)=>`img/scene1/c_${String(i+1).padStart(2,'0')}.png`)}
+    ]
+  },
+  /*
+  {
+    id: "S2",
+    text: `シーン2の本文をここに記入してください。`,
+    methods: [...]
+  },
+  {
+    id: "S3",
+    text: `シーン3の本文をここに記入してください。`,
+    methods: [...]
+  },
+  {
+    id: "S4",
+    text: `シーン4の本文をここに記入してください。`,
+    methods: [...]
+  },
+  {
+    id: "S5",
+    text: `シーン5の本文をここに記入してください。`,
+    methods: [...]
+  }
+  */
+];
 
 const btnStart=document.getElementById("btnStart");
 const nameInput=document.getElementById("responderName");
@@ -182,7 +204,7 @@ document.getElementById("btnNext").addEventListener("click",()=>{
   imageIndex++;
   if(imageIndex<30){render();return;}
   sceneIndex++;
-  if(sceneIndex<5){imageIndex=0;randomizeScene();render();return;}
+  if(sceneIndex<1){imageIndex=0;randomizeScene();render();return;} // ← scene1のみ
   stepSurvey.classList.add("hidden");
   stepFinish.classList.remove("hidden");
 });
