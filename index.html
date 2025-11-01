@@ -58,10 +58,15 @@
             <label>回答者氏名（必須）<input id="responderName" type="text" placeholder="例）山田太郎" /></label>
           </div>
           <div>
-            <label>同意確認<span class="tiny muted">（研究目的で集計し、個人を特定する目的では利用しません）</span><div class="row"><label class="tiny"><input type="checkbox" id="consentCheck"/> 研究協力に同意します</label></div></label>
+            <label>同意確認<span class="tiny muted">（研究目的で集計し、個人を特定する目的では利用しません）</span>
+              <div class="row"><label class="tiny"><input type="checkbox" id="consentCheck"/> 研究協力に同意します</label></div>
+            </label>
           </div>
         </div>
-        <div class="foot"><button class="ghost" id="btnLoadDraft">途中保存から復元</button><button id="btnStart" disabled>次へ（開始）</button></div>
+        <div class="foot">
+          <button class="ghost" id="btnLoadDraft">途中保存から復元</button>
+          <button id="btnStart" disabled>次へ（開始）</button>
+        </div>
       </section>
 
       <section id="stepSurvey" class="hidden">
@@ -77,8 +82,12 @@
               </div>
             </div>
             <div class="space"></div>
-            <div><div class="progress"><div class="bar" id="progressBar"></div></div><div class="tiny muted" id="progressText" style="margin-top:6px"></div></div>
+            <div>
+              <div class="progress"><div class="bar" id="progressBar"></div></div>
+              <div class="tiny muted" id="progressText" style="margin-top:6px"></div>
+            </div>
           </div>
+
           <div style="flex:1 1 520px">
             <p class="muted">画像を評価してください。</p>
             <div class="imgWrap"><img id="targetImg" alt="evaluation target"/></div>
@@ -87,7 +96,13 @@
               <label><input type="checkbox" name="rating" value="どちらでもない"> どちらでもない</label>
               <label><input type="checkbox" name="rating" value="描写できていない"> 描写できていない</label>
             </div>
-            <div class="controls"><button class="ghost" id="btnBack">戻る</button><div class="row"><button class="ghost" id="btnSaveLocal" title="途中保存（ローカル）">途中保存</button><button id="btnNext">次へ</button></div></div>
+            <div class="controls">
+              <button class="ghost" id="btnBack">戻る</button>
+              <div class="row">
+                <button class="ghost" id="btnSaveLocal" title="途中保存（ローカル）">途中保存</button>
+                <button id="btnNext">次へ</button>
+              </div>
+            </div>
             <div class="tiny muted" id="warnMsg"></div>
           </div>
         </div>
@@ -114,7 +129,23 @@
     ]
   }));
 
-  // --- 以下スクリプトは前と同じ（略） ---
+  // --- ボタン有効化処理 ---
+  const btnStart = document.getElementById("btnStart");
+  const nameInput = document.getElementById("responderName");
+  const consentCheck = document.getElementById("consentCheck");
+
+  function updateStartButton() {
+    const nameOk = nameInput.value.trim().length > 0;
+    const consentOk = consentCheck.checked;
+    btnStart.disabled = !(nameOk && consentOk);
+  }
+  nameInput.addEventListener("input", updateStartButton);
+  consentCheck.addEventListener("change", updateStartButton);
+
+  // --- 開始ボタン（動作テスト用） ---
+  btnStart.addEventListener("click", () => {
+    alert("開始します！（ここにアンケート本体処理を入れる）");
+  });
   </script>
 </body>
 </html>
