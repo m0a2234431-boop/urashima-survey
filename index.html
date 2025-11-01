@@ -3,11 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- ✅ タイトルを変更 -->
   <title>挿絵・描写精度アンケート（浦島太郎）2</title>
 
-  <!-- ✅ ブラウザキャッシュを無効化 -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -108,9 +105,9 @@ const scenes = [1,2,3,4,5].map(num => ({
   id:`S${num}`,
   text:`シーン${num}の本文をここに記入してください。`,
   methods:[
-    {name:"方法A：原文そのまま",images:Array.from({length:10},(_,i)=>`urashima-survey/img/scene${num}/a_${String(i+1).padStart(2,'0')}.png`)},
-    {name:"方法B：抽出要素",images:Array.from({length:10},(_,i)=>`urashima-survey/img/scene${num}/b_${String(i+1).padStart(2,'0')}.png`)},
-    {name:"方法C：要約ベース",images:Array.from({length:10},(_,i)=>`urashima-survey/img/scene${num}/c_${String(i+1).padStart(2,'0')}.png`)}
+    {name:"方法A：原文そのまま",images:Array.from({length:10},(_,i)=>`img/scene${num}/a_${String(i+1).padStart(2,'0')}.png`)},
+    {name:"方法B：抽出要素",images:Array.from({length:10},(_,i)=>`img/scene${num}/b_${String(i+1).padStart(2,'0')}.png`)},
+    {name:"方法C：要約ベース",images:Array.from({length:10},(_,i)=>`img/scene${num}/c_${String(i+1).padStart(2,'0')}.png`)}
   ]
 }));
 
