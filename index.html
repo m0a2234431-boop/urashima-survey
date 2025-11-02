@@ -116,11 +116,6 @@
           <div>
             <label>回答者氏名（必須）<input id="responderName" type="text" placeholder="例）山田太郎"></label>
           </div>
-          <div>
-            <label>同意確認
-              <div class="row"><label class="tiny"><input type="checkbox" id="consentCheck"> 研究協力に同意します</label></div>
-            </label>
-          </div>
         </div>
         <div class="foot"><button id="btnStart" disabled>次へ（開始）</button></div>
       </section>
@@ -130,7 +125,7 @@
           <div class="sceneTitle">シーン</div>
           <h2 id="sceneTitle"></h2>
           <p id="sceneText"></p>
-          <span class="tag" id="methodTag"></span>
+          <!-- <span class="tag" id="methodTag"></span> -->
           <span class="tag" id="counterTag"></span>
         </div>
         <p class="muted">画像を評価してください。</p>
@@ -291,12 +286,10 @@ const scenes = [
 // ======== 入力確認 ========
 const btnStart=document.getElementById("btnStart");
 const nameInput=document.getElementById("responderName");
-const consentCheck=document.getElementById("consentCheck");
 function updateStartButton(){
-  btnStart.disabled = !(nameInput.value.trim() && consentCheck.checked);
+  btnStart.disabled = !(nameInput.value.trim() );
 }
 nameInput.addEventListener("input",updateStartButton);
-consentCheck.addEventListener("change",updateStartButton);
 
 // ======== 要素取得 ========
 const stepIntro=document.getElementById("stepIntro");
@@ -383,3 +376,4 @@ document.getElementById("btnBack").addEventListener("click",()=>{
 </script>
 </body>
 </html>
+
