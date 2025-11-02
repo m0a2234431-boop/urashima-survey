@@ -67,6 +67,19 @@
     .ghost{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--ink)}
     .hidden{display:none}
     .foot{display:flex;gap:8px;align-items:center;justify-content:flex-end}
+
+    /* --- バッジ装飾 --- */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      color: white;
+    }
+  　.b-ok { background: #3ccf91; }      /* 緑：描写できている */
+  　.b-mid { background: #ffcc66; color:#000; } /* 黄：どちらでもない */
+  　.b-ng { background: #ff6b6b; }      /* 赤：描写できていない */
   </style>
 </head>
 <body>
@@ -88,13 +101,13 @@
           以下、アンケートの記入方法です。<br><br>
           「次へ（開始）」を押下すると、シーン本文と画像が表示されます。<br>
           本文と画像を見比べ、
-          「描写できている」「どちらでもない」「描写できていない」
+          <span class="badge b-ok">「描写できている」</span><span class="badge b-mid">「どちらでもない」</span><span class="badge b-ng">「描写できていない」</span>
           のいずれかにチェックを入れ、「次へ」を押下してください。<br>
           ※「次へ」を押下した際、数秒のラグが発生しますが、
           「次へ」を2回以上押下しないでください。<br><br>
           30枚の画像の評価を終えると次のシーンに進みます（全5シーン）。<br>
           評価終了後、ブラウザを閉じてください。
-  </p>
+        </p>
         <div class="grid2">
           <div>
             <label>回答者氏名（必須）<input id="responderName" type="text" placeholder="例）山田太郎"></label>
@@ -247,6 +260,7 @@ document.getElementById("btnBack").addEventListener("click",()=>{
 </script>
 </body>
 </html>
+
 
 
 
