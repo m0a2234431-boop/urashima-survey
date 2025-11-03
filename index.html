@@ -93,6 +93,61 @@
     .b-ok, .b-ng {
       color: #000 !important;  /* 強制的に黒文字にする */
     }
+
+    /* === ▼回答済み一覧モーダル（ここから追加）=== */
+    .modal {
+      position: fixed; inset: 0;
+      display: none;
+      align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    .modal.show { display:flex; }
+    
+    .modal__overlay{
+      position:absolute; inset:0;
+      background: rgba(0,0,0,.6);
+      backdrop-filter: blur(2px);
+    }
+    
+    .modal__panel{
+      position: relative;
+      width:min(900px, 92vw);
+      max-height: 80vh;
+      background: var(--panel);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.45);
+      padding: 16px;
+      overflow: hidden;
+      display:flex; flex-direction:column; gap:12px;
+    }
+    
+    .modal__head{
+      display:flex; align-items:center; justify-content:space-between;
+      padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .modal__title{ font-weight:800; letter-spacing:.04em; }
+    
+    .modal__body{ overflow:auto; padding-right:4px; }
+    
+    .reviewGrid{
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+      gap:10px;
+    }
+    
+    .reviewItem{
+      display:flex; flex-direction:column; gap:8px; padding:10px;
+      background:#0f1117; border:1px solid rgba(255,255,255,.08);
+      border-radius:12px;
+    }
+    .reviewThumb{
+      width:100%; aspect-ratio: 16/10; object-fit:cover;
+      border-radius:8px; border:1px solid rgba(255,255,255,.06);
+      background:#0b0d13;
+    }
+    .reviewMeta{ font-size:12px; color:var(--muted); }
+    .modal__foot{ display:flex; justify-content:flex-end; gap:8px; }
   </style>
 </head>
 <body>
@@ -163,9 +218,25 @@
         <h1>ご協力ありがとうございました！</h1>
         <p>全ての評価が完了しました。</p>
       </section>
+      
+      <!-- === ▼回答済み一覧モーダル（ここから追加）=== -->
+      <div id="reviewModal" class="modal" aria-hidden="true">
+        <div class="modal__overlay" id="reviewOverlay"></div>
+        <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="reviewTitle">
+          <div class="modal__head">
+            <div class="modal__title" id="reviewTitle">回答済みページ一覧（このシーン）</div>
+            <button id="btnCloseReview" class="ghost">閉じる</button>
+          </div>
+          <div class="modal__body">
+            <div id="reviewList" class="reviewGrid"></div>
+          </div>
+          <div class="modal__foot">
+            <button id="btnCloseReview2" class="ghost">閉じる</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-
 <script>
 // ✅ あなたのGASのWebアプリURLをここに貼り付けてください
 const GAS_ENDPOINT = "https://urashima-survey.vercel.app/api/proxy";
@@ -453,6 +524,18 @@ async function saveResponse(name, scene, method, image, rating) {
   }
 }
 
+// === ▼ローカルに回答履歴を保存する仕組み（ここから追加）===
+
+// 画像ごとの回答結果を保存する
+let answeredData = JSON.parse(localStorage.getItem("answeredData") || "{}");
+
+// 回答を保存（上書き対応）
+function saveLocalResponse(sceneId, imgIndex, data){
+  if(!answeredData[sceneId]) answeredData[sceneId] = {};
+  answeredData[sceneId][imgIndex] = data;
+  localStorage.setItem("answeredData", JSON.stringify(answeredData));
+}
+
 // ======== 開始ボタン ========
 btnStart.addEventListener("click", ()=>{
   // 🟧 強制的に新規開始：保存データを削除し、インデックスをリセット
@@ -514,6 +597,13 @@ document.getElementById("btnNext").addEventListener("click", async ()=>{
   // ✅ スプレッドシートへ送信
   await saveResponse(name, s.id, current.method, current.url, chosen.value);
 
+  // 🟢 回答をローカルにも保存（後でモーダルで表示できるように）
+  saveLocalResponse(s.id, imageIndex, {
+    method: current.method,
+    url: current.url,
+    rating: chosen.value
+  });
+
   // 🟧 ここで進行状況を保存
   saveProgress();
 
@@ -543,10 +633,51 @@ document.getElementById("btnNext").addEventListener("click", async ()=>{
   clearAllSaved();
 });
 
-// ======== 戻るボタン ========
+// ======== 戻るボタン（回答済み一覧モーダルを開く） ========
 document.getElementById("btnBack").addEventListener("click",()=>{
-  if(imageIndex>0){imageIndex--;render();}
-  saveProgress(); // 🟦 ここを追加！戻った位置も保存
+  const s = sceneOrder[sceneIndex];
+  const listDiv = document.getElementById("reviewList");
+  const modal = document.getElementById("reviewModal");
+  const records = answeredData[s.id] || {};
+  const imgs = imageOrders[s.id] || [];
+
+  listDiv.innerHTML = ""; // 初期化
+
+  imgs.forEach((img, i)=>{
+    const rated = records[i];
+    if(rated){
+      const item = document.createElement("div");
+      item.className = "reviewItem";
+      item.innerHTML = `
+        <img src="${img.url}" class="reviewThumb" alt="評価済み画像${i+1}">
+        <div class="reviewMeta">${i+1}枚目：${rated.rating}</div>
+      `;
+      item.addEventListener("click", ()=>{
+        imageIndex = i;
+        render();
+        modal.classList.remove("show");
+      });
+      listDiv.appendChild(item);
+    }
+  });
+
+  // 🟡 回答済みが1件もなかった場合のメッセージ
+  if (listDiv.innerHTML.trim() === "") {
+    listDiv.innerHTML = `<p style="text-align:center; color:var(--muted);">まだ評価済みの画像がありません。</p>`;
+  }
+
+  modal.classList.add("show");
+});
+
+// ======== モーダルを閉じる処理（ここから追加） ========
+document.getElementById("btnCloseReview").addEventListener("click", ()=>{
+  document.getElementById("reviewModal").classList.remove("show");
+});
+document.getElementById("btnCloseReview2").addEventListener("click", ()=>{
+  document.getElementById("reviewModal").classList.remove("show");
+});
+document.getElementById("reviewOverlay").addEventListener("click", ()=>{
+  document.getElementById("reviewModal").classList.remove("show");
 });
 
 // ======== ページ再読み込み時に進行を復元 ========
@@ -581,4 +712,3 @@ window.addEventListener("load", ()=>{
 </script>
 </body>
 </html>
-
