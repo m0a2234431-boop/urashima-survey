@@ -577,7 +577,11 @@ btnResume.addEventListener("click", ()=>{
   }
 
   loadImageOrdersIfAny();
-  randomizeScene();
+  
+  // 🔹 現在のシーンの画像を復元（再シャッフルしない）
+  const s = sceneOrder[sceneIndex];
+  currentImages = imageOrders[s.id];
+  
   render();
 
   // 画面切り替え
@@ -707,11 +711,14 @@ window.addEventListener("load", ()=>{
     sceneOrder.sort(()=>Math.random()-0.5);
   }
 
-  // ✅ 現在のシーンの画像リストを復元
-  randomizeScene();
+  // ✅ 保存済み imageOrders をロード（再シャッフルしない）
+  loadImageOrdersIfAny();
+  const s = sceneOrder[sceneIndex];
+  currentImages = imageOrders[s.id];
+
+  // ✅ 表示を復元
   render();
 });
 </script>
 </body>
 </html>
-
