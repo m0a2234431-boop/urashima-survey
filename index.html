@@ -111,7 +111,7 @@
         </p>
 
         <p>
-          以下、アンケートの記入方法です。<br><br>
+          以下、アンケートの記入方法です。<br>
           「次へ（開始）」を押下すると、シーン本文と画像が表示されます。<br>
           本文と画像を見比べ、
           <span class="badge b-ok">「描写できている」</span><span class="badge b-mid">「どちらでもない」</span><span class="badge b-ng">「描写できていない」</span>
@@ -119,7 +119,12 @@
           ※「次へ」を押下した際、数秒のラグが発生しますが、
           「次へ」を2回以上押下しないでください。<br><br>
           30枚の画像の評価を終えると次のシーンに進みます（全5シーン）。<br>
-          評価終了後、ブラウザを閉じてください。
+          評価終了後、ブラウザを閉じてください。<br><br>
+          本アンケートは途中で中断しても、<strong>「途中から再開」</strong>から続きから回答できます。<br>
+          回答内容はブラウザ内に自動保存されますので、ページを閉じても回答は保持されます。<br>
+          ※続きから回答する際は、<strong>必ず氏名を入力</strong>してから「途中から再開」を押下してください。<br>
+          ※「次へ」ボタンを押したあとにページを閉じる・更新しする場合、<strong>次の画像が表示されてから</strong>操作を行ってください。<br>
+          ※「次へ」押下直後に閉じると、送信処理が完了していない可能性があります。
         </p>
         <div class="grid2">
           <div>
@@ -143,9 +148,9 @@
         <p class="muted">画像を評価してください。</p>
         <div class="imgWrap"><img id="targetImg" alt="評価画像"></div>
         <div class="choices">
-          <label><input type="checkbox" name="rating" value="描写できている"> 描写できている</label>
-          <label><input type="checkbox" name="rating" value="どちらでもない"> どちらでもない</label>
-          <label><input type="checkbox" name="rating" value="描写できていない"> 描写できていない</label>
+          <label><input type="radio" name="rating" value="描写できている"> 描写できている</label>
+          <label><input type="radio" name="rating" value="どちらでもない"> どちらでもない</label>
+          <label><input type="radio" name="rating" value="描写できていない"> 描写できていない</label>
         </div>
         <div class="controls">
           <button class="ghost" id="btnBack">戻る</button>
