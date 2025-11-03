@@ -122,7 +122,7 @@
           評価終了後、ブラウザを閉じてください。<br><br>
           本アンケートは途中で中断しても、<strong>「途中から再開」</strong>から続きから回答できます。<br>
           回答内容はブラウザ内に自動保存されますので、ページを閉じても回答は保持されます。<br>
-          ※続きから回答する際は、<strong>必ず氏名を入力</strong>してから「途中から再開」を押下してください。<br>
+          ※続きから回答する際は、<strong>必ず同じ氏名を入力</strong>してから「途中から再開」を押下してください。<br>
           ※「次へ」ボタンを押したあとにページを閉じる・更新しする場合、<strong>次の画像が表示されてから</strong>操作を行ってください。<br>
           ※「次へ」押下直後に閉じると、送信処理が完了していない可能性があります。
         </p>
@@ -372,13 +372,24 @@ function clearAllSaved() {
   localStorage.removeItem(STORAGE_KEYS.imageOrders);
 }
 
-// ======== 入力確認 ========
+// ======== 入力確認（開始ボタン＋途中再開ボタン両方） ========
 const btnStart=document.getElementById("btnStart");
+const btnResume=document.getElementById("btnResume");
 const nameInput=document.getElementById("responderName");
-function updateStartButton(){
-  btnStart.disabled = !(nameInput.value.trim() );
+
+function updateButtons(){
+  const hasName = !!nameInput.value.trim();
+  const saved = loadProgressIfAny();
+
+  // 「次へ（開始）」ボタンは名前が入っていないと無効
+  btnStart.disabled = !hasName;
+
+  // 「途中から再開」ボタンは「名前＋保存データ」があるときのみ有効
+  btnResume.disabled = !(hasName && saved && saved.sceneIndex !== undefined);
 }
-nameInput.addEventListener("input",updateStartButton);
+
+nameInput.addEventListener("input",updateButtons);
+updateButtons(); // 初期化時にも実行
 
 // ======== 途中再開ボタン制御 ========
 const btnResume = document.getElementById("btnResume");
@@ -454,6 +465,11 @@ async function saveResponse(name, scene, method, image, rating) {
 
 // ======== 開始ボタン ========
 btnStart.addEventListener("click", ()=>{
+  // 🟧 強制的に新規開始：保存データを削除し、インデックスをリセット
+  clearAllSaved();
+  sceneIndex = 0;
+  imageIndex = 0;
+  
   // 🔹 イントロ画面を隠してアンケート画面を表示
   stepIntro.classList.add("hidden");
   stepSurvey.classList.remove("hidden");
