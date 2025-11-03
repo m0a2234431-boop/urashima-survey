@@ -540,6 +540,8 @@ function saveLocalResponse(sceneId, imgIndex, data){
 btnStart.addEventListener("click", ()=>{
   // 🟧 強制的に新規開始：保存データを削除し、インデックスをリセット
   clearAllSaved();
+  localStorage.removeItem("answeredData"); // 🟢 ← これを追加
+  answeredData = {};                        // 🟢 ← メモリ上も初期化
   sceneIndex = 0;
   imageIndex = 0;
   
@@ -712,3 +714,4 @@ window.addEventListener("load", ()=>{
 </script>
 </body>
 </html>
+
