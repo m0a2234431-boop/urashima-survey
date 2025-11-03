@@ -14,6 +14,9 @@
       --bg:#0b0c10; --panel:#151821; --ink:#e8ecf1; --muted:#a7b0bd; --accent:#5aa9e6; --ok:#3ccf91;
       --radius:14px;
     }
+
+    .hidden { display: none !important; }
+    
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
       font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,"Hiragino Kaku Gothic ProN","Meiryo",sans-serif}
@@ -167,15 +170,16 @@
 
         <p>
           以下、アンケートの記入方法です。<br>
-          「次へ（開始）」を押下すると、シーン本文と画像が表示されます。<br>
-          本文と画像を見比べ、
+          1.「次へ（開始）」を押下すると、シーン本文と画像が表示されます。<br>
+          2.本文と画像を見比べ、
           <span class="badge b-ok">「描写できている」</span><span class="badge b-mid">「どちらでもない」</span><span class="badge b-ng">「描写できていない」</span>
           のいずれかにチェックを入れ、「次へ」を押下してください。<br>
           ※「次へ」を押下した際、数秒のラグが発生しますが、
-          「次へ」を2回以上押下しないでください。<br><br>
-          30枚の画像の評価を終えると次のシーンに進みます（全5シーン）。<br>
-          評価終了後、ブラウザを閉じてください。<br><br>
-          本アンケートは途中で中断しても、<strong>「途中から再開」</strong>から続きから回答できます。<br>
+          「次へ」を2回以上押下しないでください。<br>
+          3.「戻る」を押下すると、回答中のシーンの回答済み画像が表示されます。回答をやり直したい画像を押下すると、該当画像の回答ページに戻ることができます。<br>
+          4.30枚の画像の評価を終えると次のシーンに進みます（全5シーン）。<br>
+          5.評価終了後、ブラウザを閉じてください。<br>
+          6.本アンケートは途中で中断しても、<strong>「途中から再開」</strong>から続きから回答できます。<br>
           回答内容はブラウザ内に自動保存されますので、ページを閉じても回答は保持されます。<br>
           ※続きから回答する際は、<strong>必ず同じ氏名を入力</strong>してから「途中から再開」を押下してください。<br>
           ※「次へ」ボタンを押したあとにページを閉じる・更新しする場合、<strong>次の画像が表示されてから</strong>操作を行ってください。<br>
