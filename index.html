@@ -462,6 +462,12 @@ function updateButtons(){
 nameInput.addEventListener("input",updateButtons);
 updateButtons(); // 初期化時にも実行
 
+// ======== 途中再開ボタン制御 ========
+function updateResumeButton(){
+  const saved = loadProgressIfAny();
+  btnResume.disabled = !(nameInput.value.trim() && saved && saved.sceneIndex !== undefined);
+}
+
 // ======== 要素取得 ========
 const stepIntro=document.getElementById("stepIntro");
 const stepSurvey=document.getElementById("stepSurvey");
@@ -694,27 +700,35 @@ window.addEventListener("load", ()=>{
 window.addEventListener("load", ()=>{
   const savedProgress = loadProgressIfAny();
 
-  // ✅ 保存データが存在しない場合はイントロ画面へ
   if(!savedProgress || savedProgress.sceneIndex === undefined){
     return;
   }
 
-  // ✅ 保存されている進行状況を反映
   sceneIndex = savedProgress.sceneIndex;
   imageIndex = savedProgress.imageIndex;
-  const savedOrder = loadSceneOrder();
 
+  const savedOrder = loadSceneOrder();
   if(savedOrder){
     sceneOrder.splice(0, sceneOrder.length, ...savedOrder);
   } else {
-    // もし順番データがなければ新たにシャッフル
     sceneOrder.sort(()=>Math.random()-0.5);
   }
 
-  // ✅ 保存済み imageOrders をロード（再シャッフルしない）
+  // ✅ 保存済みの imageOrders をロード（再シャッフルしない）
   loadImageOrdersIfAny();
+
   const s = sceneOrder[sceneIndex];
-  currentImages = imageOrders[s.id];
+  if (!s) return; // シーンが無いときは何もしない
+
+  // ✅ currentImages が無い場合は安全にランダム生成
+  if (!imageOrders[s.id]) {
+    randomizeScene();
+  }
+
+  currentImages = imageOrders[s.id] || [];
+  if (currentImages.length === 0) {
+    randomizeScene();
+  }
 
   // ✅ 表示を復元
   render();
