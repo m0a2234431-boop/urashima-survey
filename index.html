@@ -391,16 +391,6 @@ function updateButtons(){
 nameInput.addEventListener("input",updateButtons);
 updateButtons(); // 初期化時にも実行
 
-// ======== 途中再開ボタン制御 ========
-const btnResume = document.getElementById("btnResume");
-
-// localStorageに進行状況がある場合のみボタンを有効化
-function updateResumeButton(){
-  const saved = loadProgressIfAny();
-  btnResume.disabled = !(saved && saved.sceneIndex !== undefined);
-}
-updateResumeButton();
-
 // ======== 要素取得 ========
 const stepIntro=document.getElementById("stepIntro");
 const stepSurvey=document.getElementById("stepSurvey");
@@ -591,3 +581,4 @@ window.addEventListener("load", ()=>{
 </script>
 </body>
 </html>
+
