@@ -162,6 +162,13 @@
 // ✅ あなたのGASのWebアプリURLをここに貼り付けてください
 const GAS_ENDPOINT = "https://urashima-survey.vercel.app/api/proxy";
 
+// === 進行保存用キー ===
+const STORAGE_KEYS = {
+  progress: "surveyProgress",          // { name, sceneIndex, imageIndex }
+  sceneOrder: "surveySceneOrder",      // [ "S3","S5","S1","S2","S4" ] など
+  imageOrders: "surveyImageOrders"     // { S1: [{method,url},...30], S2: [...], ... }
+};
+
 // ======== シーン構成 ========
 const scenes = [
   {
@@ -292,6 +299,71 @@ const scenes = [
   }
 ];
 
+// ======== シーン順ランダム化と保存・復元 ========
+function saveSceneOrder() {
+  const ids = sceneOrder.map(s => s.id);
+  localStorage.setItem(STORAGE_KEYS.sceneOrder, JSON.stringify(ids));
+}
+
+function loadSceneOrder() {
+  const raw = localStorage.getItem(STORAGE_KEYS.sceneOrder);
+  if (!raw) return null;
+  try {
+    const ids = JSON.parse(raw);
+    return ids.map(id => scenes.find(s => s.id === id)).filter(Boolean);
+  } catch {
+    return null;
+  }
+}
+
+// ======== 各シーン内の画像順と進行状況の保存・復元 ========
+let sceneOrder = scenes.slice().sort(()=>Math.random()-0.5);
+
+// --- 画像順を保存するための変数 ---
+let imageOrders = {}; // { S1: [{method,url}, ...30], S2: [...], ... }
+
+// --- imageOrders を保存 ---
+function saveImageOrders() {
+  localStorage.setItem(STORAGE_KEYS.imageOrders, JSON.stringify(imageOrders));
+}
+
+// --- imageOrders を復元 ---
+function loadImageOrdersIfAny() {
+  const raw = localStorage.getItem(STORAGE_KEYS.imageOrders);
+  if (!raw) return false;
+  try {
+    imageOrders = JSON.parse(raw) || {};
+    return true;
+  } catch {
+    imageOrders = {};
+    return false;
+  }
+}
+
+// --- 進行状況（名前・現在のシーン・画像番号）を保存 ---
+function saveProgress() {
+  const progress = {
+    name: nameInput.value.trim(),
+    sceneIndex,
+    imageIndex
+  };
+  localStorage.setItem(STORAGE_KEYS.progress, JSON.stringify(progress));
+}
+
+// --- 保存されていた進行状況を読み込み ---
+function loadProgressIfAny() {
+  const raw = localStorage.getItem(STORAGE_KEYS.progress);
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+// --- 保存データを全削除（完了時に使う） ---
+function clearAllSaved() {
+  localStorage.removeItem(STORAGE_KEYS.progress);
+  localStorage.removeItem(STORAGE_KEYS.sceneOrder);
+  localStorage.removeItem(STORAGE_KEYS.imageOrders);
+}
+
 // ======== 入力確認 ========
 const btnStart=document.getElementById("btnStart");
 const nameInput=document.getElementById("responderName");
@@ -312,14 +384,24 @@ const ratingBoxes=document.querySelectorAll("input[name='rating']");
 const warnMsg=document.getElementById("warnMsg");
 
 let sceneIndex=0,imageIndex=0,currentImages=[];
-const sceneOrder=scenes.sort(()=>Math.random()-0.5);
 
-// ======== シーンランダム化 ========
+// ======== シーンランダム化（保存された順番を再現対応） ========
 function randomizeScene(){
-  const s=sceneOrder[sceneIndex];
-  const imgs=[];
-  s.methods.forEach(m=>m.images.forEach(u=>imgs.push({method:m.name,url:u})));
-  currentImages=imgs.sort(()=>Math.random()-0.5);
+  const s = sceneOrder[sceneIndex];
+
+  // 🔹 すでに保存済み（imageOrders）に並び順がある場合はそれを使う
+  if (imageOrders[s.id] && Array.isArray(imageOrders[s.id]) && imageOrders[s.id].length === 30) {
+    currentImages = imageOrders[s.id];
+    return;
+  }
+
+  // 🔹 まだ保存されていない場合：新しく作ってランダム化して保存
+  const imgs = [];
+  s.methods.forEach(m => m.images.forEach(u => imgs.push({ method: m.name, url: u })));
+
+  currentImages = imgs.sort(()=>Math.random()-0.5);
+  imageOrders[s.id] = currentImages;  // 保存用
+  saveImageOrders();                  // 保存
 }
 
 // ======== 画面表示更新 ========
@@ -353,11 +435,22 @@ async function saveResponse(name, scene, method, image, rating) {
 }
 
 // ======== 開始ボタン ========
-btnStart.addEventListener("click",()=>{
+btnStart.addEventListener("click", ()=>{
+  // 🔹 イントロ画面を隠してアンケート画面を表示
   stepIntro.classList.add("hidden");
   stepSurvey.classList.remove("hidden");
+
+  // 🔹 シーン順を保存（sceneOrderを固定）
+  saveSceneOrder();
+
+  // 🔹 最初のシーンの画像順を作成・保存
   randomizeScene();
+
+  // 🔹 最初の画面を描画
   render();
+
+  // 🔹 初期進行状況を保存
+  saveProgress();
 });
 
 // ======== 次へボタン ========
@@ -372,9 +465,13 @@ document.getElementById("btnNext").addEventListener("click", async ()=>{
   // ✅ スプレッドシートへ送信
   await saveResponse(name, s.id, current.method, current.url, chosen.value);
 
+  // 🟧 ここで進行状況を保存
+  saveProgress();
+
   imageIndex++;
   if (imageIndex < 30) {
     render();
+    saveProgress();
     return;
   }
 
@@ -385,20 +482,53 @@ document.getElementById("btnNext").addEventListener("click", async ()=>{
     imageIndex = 0;
     randomizeScene();
     render();
+    saveProgress();
     return;
   }
   
   // ✅ 全てのシーンを評価し終わったら完了画面へ
   stepSurvey.classList.add("hidden");
   stepFinish.classList.remove("hidden");
+
+  // 🟧 完了時に保存データを削除
+  clearAllSaved();
 });
 
 // ======== 戻るボタン ========
 document.getElementById("btnBack").addEventListener("click",()=>{
   if(imageIndex>0){imageIndex--;render();}
+  saveProgress(); // 🟦 ここを追加！戻った位置も保存
+});
+
+// ======== ページ再読み込み時に進行を復元 ========
+window.addEventListener("load", ()=>{
+  const savedProgress = loadProgress();
+
+  // ✅ 保存データが存在しない場合はイントロ画面へ
+  if(!savedProgress || savedProgress.sceneIndex === undefined){
+    return;
+  }
+
+  // ✅ 保存されている進行状況を反映
+  sceneIndex = savedProgress.sceneIndex;
+  imageIndex = savedProgress.imageIndex;
+  const savedOrder = loadSceneOrder();
+
+  if(savedOrder){
+    sceneOrder.splice(0, sceneOrder.length, ...savedOrder);
+  } else {
+    // もし順番データがなければ新たにシャッフル
+    sceneOrder.sort(()=>Math.random()-0.5);
+  }
+
+  // ✅ 現在のシーンの画像リストを復元
+  randomizeScene();
+  render();
+
+  // ✅ 画面をアンケート画面に切り替え
+  stepIntro.classList.add("hidden");
+  stepSurvey.classList.remove("hidden");
 });
 </script>
 </body>
 </html>
-
-
