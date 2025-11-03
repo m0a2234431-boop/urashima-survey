@@ -237,6 +237,36 @@
       </div>
     </div>
   </div>
+  
+    <!-- === ▼送信中オーバーレイ === -->
+  <div id="loadingOverlay" class="hidden" style="
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    z-index: 2000;
+    backdrop-filter: blur(3px);
+  ">
+    <div class="spinner" style="
+      width: 48px; height: 48px;
+      border: 4px solid rgba(255,255,255,.3);
+      border-top: 4px solid var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    "></div>
+    <div>データを送信中です。しばらくお待ちください…</div>
+  </div>
+  <style>
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  </style>
 <script>
 // ✅ あなたのGASのWebアプリURLをここに貼り付けてください
 const GAS_ENDPOINT = "https://urashima-survey.vercel.app/api/proxy";
@@ -602,48 +632,51 @@ document.getElementById("btnNext").addEventListener("click", async ()=>{
   const chosen=[...ratingBoxes].find(b=>b.checked);
   if(!chosen){warnMsg.textContent="選択してください";return;}
 
+  const overlay = document.getElementById("loadingOverlay");
+  overlay.classList.remove("hidden"); // 🟢 送信中オーバーレイを表示
+
   const current = currentImages[imageIndex];
   const s = sceneOrder[sceneIndex];
   const name = nameInput.value.trim();
 
-  // ✅ スプレッドシートへ送信
-  await saveResponse(name, s.id, current.method, current.url, chosen.value);
-
-  // 🟢 回答をローカルにも保存（後でモーダルで表示できるように）
-  saveLocalResponse(s.id, imageIndex, {
-    method: current.method,
-    url: current.url,
-    rating: chosen.value
-  });
-
-  // 🟧 ここで進行状況を保存
-  saveProgress();
-
-  imageIndex++;
-  if (imageIndex < 30) {
-    render();
-    saveProgress();
-    return;
-  }
-
-  sceneIndex++;
-
-  // ✅ まだ次のシーンが残っている場合は次のシーンへ進む
-  if (sceneIndex < sceneOrder.length) {
-    imageIndex = 0;
-    randomizeScene();
-    render();
-    saveProgress();
-    return;
-  }
+  try {
+    // ✅ スプレッドシートへ送信
+    await saveResponse(name, s.id, current.method, current.url, chosen.value);
   
-  // ✅ 全てのシーンを評価し終わったら完了画面へ
-  stepSurvey.classList.add("hidden");
-  stepFinish.classList.remove("hidden");
-
-  // 🟧 完了時に保存データを削除
-  clearAllSaved();
-});
+    // 🟢 回答をローカルにも保存（後でモーダルで表示できるように）
+    saveLocalResponse(s.id, imageIndex, {
+      method: current.method,
+      url: current.url,
+      rating: chosen.value
+    });
+  
+    // 🟧 ここで進行状況を保存
+      saveProgress();
+  
+      imageIndex++;
+      if (imageIndex < 30) {
+        render();
+        saveProgress();
+      } else {
+        sceneIndex++;
+        if (sceneIndex < sceneOrder.length) {
+          imageIndex = 0;
+          randomizeScene();
+          render();
+          saveProgress();
+        } else {
+          stepSurvey.classList.add("hidden");
+          stepFinish.classList.remove("hidden");
+          clearAllSaved();
+        }
+      }
+    } catch(err) {
+      console.error("送信エラー:", err);
+      alert("通信エラーが発生しました。再試行してください。");
+    } finally {
+      overlay.classList.add("hidden"); // 🟢 送信完了後に隠す
+    }
+  });
 
 // ======== 戻るボタン（回答済み一覧モーダルを開く） ========
 document.getElementById("btnBack").addEventListener("click",()=>{
