@@ -126,7 +126,10 @@
             <label>回答者氏名（必須）<input id="responderName" type="text" placeholder="例）山田太郎"></label>
           </div>
         </div>
-        <div class="foot"><button id="btnStart" disabled>次へ（開始）</button></div>
+        <div class="foot">
+          <button id="btnResume" class="ghost" disabled>途中から再開</button>
+          <button id="btnStart" disabled>次へ（開始）</button>
+        </div>
       </section>
 
       <section id="stepSurvey" class="hidden">
@@ -372,6 +375,16 @@ function updateStartButton(){
 }
 nameInput.addEventListener("input",updateStartButton);
 
+// ======== 途中再開ボタン制御 ========
+const btnResume = document.getElementById("btnResume");
+
+// localStorageに進行状況がある場合のみボタンを有効化
+function updateResumeButton(){
+  const saved = loadProgressIfAny();
+  btnResume.disabled = !(saved && saved.sceneIndex !== undefined);
+}
+updateResumeButton();
+
 // ======== 要素取得 ========
 const stepIntro=document.getElementById("stepIntro");
 const stepSurvey=document.getElementById("stepSurvey");
@@ -453,6 +466,31 @@ btnStart.addEventListener("click", ()=>{
   saveProgress();
 });
 
+// ======== 途中から再開ボタン ========
+btnResume.addEventListener("click", ()=>{
+  const saved = loadProgressIfAny();
+  if(!saved) return; // 念のため
+
+  // 保存データ反映
+  sceneIndex = saved.sceneIndex;
+  imageIndex = saved.imageIndex;
+
+  const savedOrder = loadSceneOrder();
+  if(savedOrder){
+    sceneOrder.splice(0, sceneOrder.length, ...savedOrder);
+  }
+
+  loadImageOrdersIfAny();
+  randomizeScene();
+  render();
+
+  // 画面切り替え
+  stepIntro.classList.add("hidden");
+  stepSurvey.classList.remove("hidden");
+
+  updateResumeButton();
+});
+
 // ======== 次へボタン ========
 document.getElementById("btnNext").addEventListener("click", async ()=>{
   const chosen=[...ratingBoxes].find(b=>b.checked);
@@ -502,7 +540,11 @@ document.getElementById("btnBack").addEventListener("click",()=>{
 
 // ======== ページ再読み込み時に進行を復元 ========
 window.addEventListener("load", ()=>{
-  const savedProgress = loadProgress();
+  updateResumeButton();
+});
+
+window.addEventListener("load", ()=>{
+  const savedProgress = loadProgressIfAny();
 
   // ✅ 保存データが存在しない場合はイントロ画面へ
   if(!savedProgress || savedProgress.sceneIndex === undefined){
@@ -532,3 +574,4 @@ window.addEventListener("load", ()=>{
 </script>
 </body>
 </html>
+
